@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """JSON-RPC bridge that runs a Python extension inside Blurp Suite.
 
-The Java host speaks line-delimited JSON on stdin/stdout.  All extension
-output is redirected to stderr so it cannot corrupt the protocol stream.
+The Java host speaks line-delimited JSON on stdin/stdout.  ``sys.stdout`` is
+replaced by a protocol wrapper: only transport frames go to the real pipe,
+while ordinary extension output is written to stderr.
 """
 
 from __future__ import annotations
@@ -12,11 +13,48 @@ import importlib.util
 import json
 import os
 import sys
+import threading
 import traceback
 from pathlib import Path
 from typing import Any
 
 from .api import BurpExtenderCallbacks, HttpRequestResponse, InterceptedProxyMessage, HttpService, decode
+
+
+class ProtocolStdout:
+    """Line-oriented stdout that only accepts frames emitted by the transport."""
+
+    def __init__(self, stream):
+        self._stream = stream
+        self._pipe_lock = threading.Lock()
+
+    def transport_frame(self, frame: str) -> None:
+        # The pipe is private to the transport. Never route ordinary writes
+        # through the flag-style gate: a second thread observing an "open"
+        # window can inject non-JSON text and break framing for every caller.
+        with self._pipe_lock:
+            self._stream.write(frame)
+            self._stream.flush()
+
+    def write(self, text: str):
+        sys.stderr.write(text)
+        sys.stderr.flush()
+        return len(text)
+
+    def flush(self):
+        sys.stderr.flush()
+
+    def writable(self) -> bool:
+        return True
+
+    def isatty(self) -> bool:
+        return False
+
+    def fileno(self):
+        return self._stream.fileno()
+
+    def __getattr__(self, name):
+        return getattr(self._stream, name)
 
 
 class Transport:
@@ -26,11 +64,14 @@ class Transport:
         self._next_id = 1
         self._pending: dict[int, dict] = {}
         self._listeners: dict[str, Any] = {}
+        self._next_id_lock = threading.Lock()
+        self._pipe_lock = threading.Lock()
         self.closed = False
 
     def call(self, method: str, params: dict | None = None) -> dict:
-        request_id = self._next_id
-        self._next_id += 1
+        with self._next_id_lock:
+            request_id = self._next_id
+            self._next_id += 1
         message = {"jsonrpc": "2.0", "id": request_id, "method": method,
                    "params": params or {}}
         self._send(message)
@@ -59,8 +100,14 @@ class Transport:
         self._listeners[name] = handler
 
     def _send(self, message: dict) -> None:
-        sys.stdout.write(json.dumps(message, separators=(",", ":")) + "\n")
-        sys.stdout.flush()
+        frame = json.dumps(message, separators=(",", ":")) + "\n"
+        output = sys.stdout
+        if isinstance(output, ProtocolStdout):
+            output.transport_frame(frame)
+        else:
+            with self._pipe_lock:
+                output.write(frame)
+                output.flush()
 
     def _read_one(self) -> None:
         line = sys.stdin.readline()
@@ -117,6 +164,9 @@ def main() -> int:
     if len(sys.argv) != 2:
         print("usage: python -m blurp.bridge <extension.py>", file=sys.stderr)
         return 2
+
+    if not isinstance(sys.stdout, ProtocolStdout):
+        sys.stdout = ProtocolStdout(sys.stdout)
 
     script = Path(sys.argv[1]).resolve()
     parent = str(script.parent)

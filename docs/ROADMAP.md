@@ -11,6 +11,8 @@ promise; items move as implementation and testing capacity allow.
 - Java extension loading from JARs, class directories, and single class files.
 - Python extensions through a JSON-RPC bridge using the `burp` package name.
 - Dependency-free unit tests and an end-to-end extension lifecycle test.
+- Ten bundled offline Python extensions covering common pentest workflows
+  (see [EXTENSION-KIT.md](EXTENSION-KIT.md)).
 
 ## Next
 

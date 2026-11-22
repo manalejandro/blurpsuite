@@ -63,8 +63,8 @@ where noted.
 | `--python <executable>` | `python3` | Python executable used to start Python extensions. |
 | `--headless` | off | Run without the Swing UI; press Ctrl+C to stop. |
 | `--extension-arg <value>` | none | Pass a value to extensions (exposed via `IBurpExtenderCallbacks.getCommandLineArguments()` and to Python as `BLURP_EXTENSION_ARGS`). Repeatable. |
-| `--version` (`-V`) | — | Print `Blurp Suite 1.0.0` and exit. |
-| `--help` (`-h`) | — | Show usage and exit. |
+| `--version` (`-V`) | - | Print `Blurp Suite 1.0.0` and exit. |
+| `--help` (`-h`) | - | Show usage and exit. |
 
 Example with repeated flags:
 
@@ -105,6 +105,11 @@ The bundled examples are in `python/examples`:
 
 - `header_modifier.py` adds `X-Blurp-Python: yes` to proxied requests.
 - `commenter.py` sets comments and highlights on proxied responses.
+- `kit/` is a ten-module offline extension kit (Autorize, Active Scan++,
+  Logger++, Param Miner, Turbo Intruder, Collaborator Everywhere, JSON
+  Beautifier, Retire.js, Backslash Powered Scanner and CSRF Scanner). Load them
+  all with `--extension python/examples/kit/all.py`. See
+  [docs/EXTENSION-KIT.md](docs/EXTENSION-KIT.md) for settings and safety notes.
 
 ```bash
 java -cp build/classes com.blurpsuite.Main \
@@ -161,7 +166,7 @@ Regenerate them with `python3 tools/generate_burp_api.py` after changing
 ./build.sh build       # compile main sources into build/classes
 ./build.sh test        # compile tests/java and run TestRunner
 ./build.sh python-test # run the Python bridge unit tests with unittest
-./build.sh e2e         # run both end-to-end tests (state listener and proxy)
+./build.sh e2e         # run all end-to-end tests (state listener, proxy and kit)
 ./build.sh examples    # compile examples/java
 ./build.sh all         # build + test + python-test + e2e
 ./build.sh run [args]  # build and launch com.blurpsuite.Main
@@ -173,20 +178,22 @@ honors `BLURP_TEST_PORT` (default `18123`).
 
 ### Python unit tests and end-to-end tests
 
-The Python bridge has a dependency-free `unittest` suite, and two shell scripts
-exercise the running application end to end. Run all three directly from the
-repository root:
+The Python bridge has a dependency-free `unittest` suite, and three shell
+scripts exercise the running application end to end. Run all four directly from
+the repository root:
 
 ```bash
 python3 -m unittest discover -s tests/python -v
 bash tests/e2e/run_state_listener_test.sh
 bash tests/e2e/run_proxy_test.sh
+bash tests/e2e/run_extension_kit_test.sh
 ```
 
 `./build.sh python-test` runs the same unittest suite, `./build.sh e2e` runs
-both end-to-end scripts, and `./build.sh all` runs the Java and Python unit
-tests followed by both end-to-end scripts. The proxy test also honors
-`BLURP_PROXY_PORT` (default `18080`) and `BLURP_ORIGIN_PORT` (default `18090`).
+all three end-to-end scripts, and `./build.sh all` runs the Java and Python unit
+tests followed by all three end-to-end scripts. The proxy test also honors
+`BLURP_PROXY_PORT` (default `18080`) and `BLURP_ORIGIN_PORT` (default `18090`);
+the kit test honors `BLURP_KIT_PORT` (default `18124`).
 
 ### Maven
 
@@ -206,12 +213,12 @@ JUnit tests; see the comments in `pom.xml`.
 gradle build           # compile and run checks
 gradle run             # run com.blurpsuite.Main
 gradle test            # runs the Java TestRunner and the Python unittest suite
-gradle e2e             # runs both end-to-end extension tests
+gradle e2e             # runs all three end-to-end extension tests
 ```
 
 Gradle compiles `tests/java` (and `src/test/java`) as test sources; the custom
 `unitTests` task performs the Java test run, `pythonTests` runs the Python bridge
-unit tests, and `e2e` runs both `tests/e2e` scripts.
+unit tests, and `e2e` runs all three `tests/e2e` scripts.
 
 ## Limitations
 

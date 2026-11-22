@@ -16,7 +16,7 @@ Commands:
   build      Compile all main sources with javac --release 17 into build/classes
   test       Compile tests/java and run the dependency-free TestRunner
   python-test Run the Python bridge unit tests with unittest
-  e2e        Run both end-to-end tests (state listener and proxy)
+  e2e        Run the end-to-end tests (state listener, proxy and extension kit)
   examples   Compile examples/java into build/example-extensions
   all        Run build, test, python-test, and e2e
   run [args] Build, then launch com.blurpsuite.Main with the given arguments
@@ -101,6 +101,7 @@ case "$command" in
         build_main
         (cd "$ROOT" && bash tests/e2e/run_state_listener_test.sh "$@")
         (cd "$ROOT" && bash tests/e2e/run_proxy_test.sh "$@")
+        (cd "$ROOT" && bash tests/e2e/run_extension_kit_test.sh "$@")
         ;;
     examples)
         build_examples
@@ -111,6 +112,7 @@ case "$command" in
         python_tests
         (cd "$ROOT" && bash tests/e2e/run_state_listener_test.sh)
         (cd "$ROOT" && bash tests/e2e/run_proxy_test.sh)
+        (cd "$ROOT" && bash tests/e2e/run_extension_kit_test.sh)
         ;;
     run)
         build_main

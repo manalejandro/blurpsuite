@@ -85,14 +85,20 @@ task e2eProxy(type: Exec) {
     commandLine 'bash', "${projectDir}/tests/e2e/run_proxy_test.sh"
 }
 
+task e2eExtensionKit(type: Exec) {
+    group = 'verification'
+    description = 'Runs tests/e2e/run_extension_kit_test.sh (all offline kit modules load).'
+    dependsOn 'classes'
+    commandLine 'bash', "${projectDir}/tests/e2e/run_extension_kit_test.sh"
+}
+
 task e2e {
     group = 'verification'
-    // Runs both e2e scripts: tests/e2e/run_state_listener_test.sh and tests/e2e/run_proxy_test.sh.
-    description = 'Runs both end-to-end tests: state listener and proxy.'
-    dependsOn 'e2eStateListener', 'e2eProxy'
+    description = 'Runs all end-to-end tests: state listener, proxy and extension kit.'
+    dependsOn 'e2eStateListener', 'e2eProxy', 'e2eExtensionKit'
 }
 
 check {
-    // Verification covers Java and Python unit tests plus both e2e scripts.
+    // Verification covers Java and Python unit tests plus all e2e scripts.
     dependsOn 'e2e'
 }

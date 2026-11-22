@@ -41,6 +41,16 @@ public final class Main {
         extensions.setPythonHome(options.pythonHome);
         extensions.setPythonExecutable(options.pythonExecutable);
 
+        // Install this before startup: a shutdown signal can arrive as soon as
+        // the proxy announces that it is listening.
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                extensions.unloadAll();
+            } finally {
+                proxy.stop();
+            }
+        }, "blurp-shutdown"));
+
         for (Path extension : options.extensions) {
             try {
                 loadExtension(extensions, extension);
@@ -55,10 +65,6 @@ public final class Main {
 
         if (options.headless) {
             stdout.println("Headless mode: press Ctrl+C to stop.");
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                extensions.unloadAll();
-                proxy.stop();
-            }));
             new CountDownLatch(1).await();
             return;
         }
@@ -71,11 +77,6 @@ public final class Main {
             window.addExtensionTabs(callbacks);
             window.setVisible(true);
         });
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            extensions.unloadAll();
-            proxy.stop();
-        }));
     }
 
     private static void loadExtension(ExtensionManager manager, Path path) throws Exception {

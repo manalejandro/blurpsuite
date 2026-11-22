@@ -17,6 +17,8 @@ import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,11 +31,22 @@ public final class MainWindow extends JFrame implements TabHost {
     private final transient Set<Component> extensionTabs = new HashSet<>();
     private final DashboardPanel dashboard;
     private final InterceptPanel intercept;
+    private final transient ProxyServer proxy;
+    private final transient ExtensionManager extensions;
+    private volatile boolean shuttingDown;
 
     public MainWindow(ProxyServer proxy, ExtensionManager extensions, JTextArea consoleArea,
                       PrintStream stdout, PrintStream stderr) {
         super("Blurp Suite 1.0.0");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.proxy = proxy;
+        this.extensions = extensions;
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                shutdown();
+            }
+        });
         setMinimumSize(new Dimension(1024, 700));
         setSize(1280, 820);
         setLocationRelativeTo(null);
@@ -64,7 +77,7 @@ public final class MainWindow extends JFrame implements TabHost {
         JMenuBar bar = new JMenuBar();
         JMenu file = new JMenu("File");
         JMenuItem exit = new JMenuItem("Exit");
-        exit.addActionListener(e -> dispose());
+        exit.addActionListener(e -> shutdown());
         file.add(exit);
         JMenu help = new JMenu("Help");
         JMenuItem about = new JMenuItem("About Blurp Suite");
@@ -87,6 +100,29 @@ public final class MainWindow extends JFrame implements TabHost {
         Component component = tab.getUiComponent();
         extensionTabs.add(component);
         SwingUtilities.invokeLater(() -> tabs.addTab(tab.getTabCaption(), component));
+    }
+
+    /**
+     * Releases extensions and the proxy before closing the window.
+     * A plain {@code dispose()} leaves the Swing event dispatch thread running,
+     * which is why both the window close button and the Exit menu use this
+     * method.
+     */
+    public void shutdown() {
+        if (shuttingDown) {
+            return;
+        }
+        shuttingDown = true;
+        try {
+            extensions.unloadAll();
+        } finally {
+            try {
+                proxy.stop();
+            } finally {
+                dispose();
+                System.exit(0);
+            }
+        }
     }
 
     /** Refreshes panels whose state can be changed from the CLI or an extension. */

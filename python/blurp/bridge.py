@@ -132,16 +132,20 @@ def main() -> int:
     extension = None
     state_notified = False
 
+    def call_listener(listener, method_name, *args):
+        try:
+            getattr(listener, method_name)(*args)
+        except Exception as exc:
+            print(method_name + " listener failed: " + str(exc), file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+
     def notify_state_listeners():
         nonlocal state_notified
         if state_notified:
             return
         state_notified = True
         for listener in callbacks.state_listeners:
-            try:
-                listener.extensionUnloaded()
-            except Exception as exc:
-                print("state listener failed: " + str(exc), file=sys.stderr)
+            call_listener(listener, "extensionUnloaded")
 
     def get_info(_params):
         return {
@@ -155,9 +159,9 @@ def main() -> int:
     def proxy_message(params):
         is_request = bool(params.get("isRequest", True))
         raw = decode(params.get("message"))
-        service = HttpService.from_dict(params.get("service"))
+        original_service = HttpService.from_dict(params.get("service"))
         info = HttpRequestResponse(raw if is_request else b"",
-                                   b"" if is_request else raw, service,
+                                   b"" if is_request else raw, original_service,
                                    comment=params.get("comment", ""),
                                    highlight=params.get("highlight", ""),
                                    reference=int(params.get("reference", 0) or 0))
@@ -165,7 +169,7 @@ def main() -> int:
                                               params.get("listener", ""),
                                               params.get("clientAddress", ""))
         for listener in callbacks.proxy_listeners:
-            listener.processProxyMessage(is_request, intercepted)
+            call_listener(listener, "processProxyMessage", is_request, intercepted)
         action = intercepted.getInterceptAction()
         result = {"action": action, "drop": action == 3}
         message = info.getRequest() if is_request else info.getResponse()
@@ -175,20 +179,32 @@ def main() -> int:
             result["comment"] = info.getComment()
         if info.getHighlight() != params.get("highlight", ""):
             result["highlight"] = info.getHighlight()
+        if info.getHttpService().to_dict() != original_service.to_dict():
+            result["service"] = info.getHttpService().to_dict()
         return result
 
     def http_message(params):
         is_request = bool(params.get("isRequest", True))
         raw = decode(params.get("message"))
+        original_service = HttpService.from_dict(params.get("service"))
         info = HttpRequestResponse(raw if is_request else b"",
-                                   b"" if is_request else raw,
-                                   HttpService.from_dict(params.get("service")))
+                                   b"" if is_request else raw, original_service,
+                                   comment=params.get("comment", ""),
+                                   highlight=params.get("highlight", ""))
         for listener in callbacks.http_listeners:
-            listener.processHttpMessage(int(params.get("tool", 4)), is_request, info)
+            call_listener(listener, "processHttpMessage",
+                          int(params.get("tool", 4)), is_request, info)
+        result = {}
         message = info.getRequest() if is_request else info.getResponse()
-        if message == raw:
-            return {}
-        return {"message": base64.b64encode(message).decode("ascii")}
+        if message != raw:
+            result["message"] = base64.b64encode(message).decode("ascii")
+        if info.getComment() != params.get("comment", ""):
+            result["comment"] = info.getComment()
+        if info.getHighlight() != params.get("highlight", ""):
+            result["highlight"] = info.getHighlight()
+        if info.getHttpService().to_dict() != original_service.to_dict():
+            result["service"] = info.getHttpService().to_dict()
+        return result
 
     def unloaded(_params):
         notify_state_listeners()
@@ -196,7 +212,7 @@ def main() -> int:
 
     def scope_changed(_params):
         for listener in callbacks.scope_listeners:
-            listener.scopeChanged()
+            call_listener(listener, "scopeChanged")
         return {}
 
     transport.register("get_extension_info", get_info)

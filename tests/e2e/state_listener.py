@@ -1,5 +1,6 @@
 """Test fixture: writes a marker file when the host calls extensionUnloaded()."""
 
+import json
 import os
 
 from burp import IBurpExtender, IExtensionStateListener
@@ -13,6 +14,10 @@ class BurpExtender(IBurpExtender, IExtensionStateListener):
         self._callbacks = callbacks
         callbacks.setExtensionName("State Listener Test (Python)")
         callbacks.registerExtensionStateListener(self)
+        args_marker = os.environ.get("BLURP_TEST_ARGS")
+        if args_marker:
+            with open(args_marker, "w", encoding="utf-8") as handle:
+                json.dump(callbacks.getCommandLineArguments(), handle)
 
     def extensionUnloaded(self):
         marker = os.environ.get("BLURP_TEST_MARKER")

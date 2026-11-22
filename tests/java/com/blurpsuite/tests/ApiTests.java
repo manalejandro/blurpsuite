@@ -2,9 +2,11 @@ package com.blurpsuite.tests;
 
 import burp.IExtensionStateListener;
 import burp.IHttpRequestResponse;
+import burp.IInterceptedProxyMessage;
 import burp.IParameter;
 import burp.IProxyListener;
 import burp.IScopeChangeListener;
+import com.blurpsuite.api.ApiTrafficBridge;
 import com.blurpsuite.api.BurpExtenderCallbacksImpl;
 import com.blurpsuite.api.ExtensionHelpersImpl;
 import com.blurpsuite.core.HttpExchange;
@@ -93,6 +95,25 @@ public final class ApiTests {
         eq(callbacks.getProxyListeners().size(), 1, "proxy listener registered");
         callbacks.removeProxyListener(listener);
         check(callbacks.getProxyListeners().isEmpty(), "proxy listener removed");
+    }
+
+    public void testProxyListenerRehookRerunsListeners() {
+        BurpExtenderCallbacksImpl callbacks = callbacks();
+        AtomicInteger calls = new AtomicInteger();
+        IProxyListener listener = (messageIsRequest, message) -> {
+            int pass = calls.incrementAndGet();
+            message.getMessageInfo().setComment("pass-" + pass);
+            if (pass == 1) {
+                message.setInterceptAction(IInterceptedProxyMessage.ACTION_FOLLOW_RULES_AND_REHOOK);
+            }
+        };
+        callbacks.registerProxyListener(listener);
+        HttpExchange exchange = new HttpExchange(1L, ByteUtil.toBytes("GET / HTTP/1.1\r\n\r\n"),
+                new Service("example.org", 80, "http"), "test", "");
+
+        check(new ApiTrafficBridge(callbacks).onMessage(true, exchange), "rehook does not drop traffic");
+        eq(calls.get(), 2, "rehook ran the proxy listener twice");
+        eq(exchange.getComment(), "pass-2", "second listener pass sees the updated exchange");
     }
 
     public void testSiteMapAndCookieJar() {

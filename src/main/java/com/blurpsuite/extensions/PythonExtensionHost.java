@@ -18,6 +18,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -41,13 +42,16 @@ public final class PythonExtensionHost implements TrafficListener, AutoCloseable
     private volatile Runnable scopeNotification;
 
     public PythonExtensionHost(BurpExtenderCallbacksImpl callbacks, Path script, Path pythonHome,
-                               String pythonExecutable) throws IOException {
+                               String pythonExecutable, String[] extensionArguments)
+            throws IOException {
         this.callbacks = callbacks;
         this.script = script.toAbsolutePath().normalize();
 
         ProcessBuilder builder = new ProcessBuilder(pythonExecutable, "-m", "blurp.bridge",
                 this.script.toString());
         builder.environment().put("PYTHONPATH", pythonHome.toAbsolutePath().normalize().toString());
+        builder.environment().put("BLURP_EXTENSION_ARGS",
+                Json.write(Arrays.asList(extensionArguments)));
         builder.redirectErrorStream(false);
         // Python diagnostics go straight to the host's stderr; stdout stays a clean RPC pipe.
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -94,6 +98,8 @@ public final class PythonExtensionHost implements TrafficListener, AutoCloseable
                 httpParams.put("message", encode(messageIsRequest
                         ? exchange.getRequest() : exchange.getResponse()));
                 httpParams.put("reference", exchange.reference());
+                httpParams.put("comment", exchange.getComment() == null ? "" : exchange.getComment());
+                httpParams.put("highlight", exchange.getHighlight() == null ? "" : exchange.getHighlight());
                 if (exchange.getHttpService() != null) {
                     httpParams.put("service", serviceMap(exchange.getHttpService()));
                 }
@@ -147,6 +153,12 @@ public final class PythonExtensionHost implements TrafficListener, AutoCloseable
         Object highlight = reply.get("highlight");
         if (highlight instanceof String value) {
             exchange.setHighlight(value);
+        }
+        if (reply.get("service") instanceof Map<?, ?> value) {
+            exchange.setHttpService(new Service(
+                    Json.string(value.get("host"), ""),
+                    Json.integer(value.get("port"), 0),
+                    Json.string(value.get("protocol"), "http")));
         }
     }
 

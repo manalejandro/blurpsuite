@@ -169,7 +169,7 @@ class ProxyHandlerTests(unittest.TestCase):
             "isRequest": False, "request": "", "response": RAW_RESPONSE,
         }])
 
-    def test_listener_exception_becomes_error_reply_and_bridge_keeps_serving(self):
+    def test_listener_exception_is_isolated_and_bridge_keeps_serving(self):
         inbound = [
             proxy_params(is_request=True, message=encode(RAW_REQUEST.encode()),
                          comment="bad", reference=1),
@@ -181,10 +181,11 @@ class ProxyHandlerTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0)
         self.assertEqual([frame["id"] for frame in result.frames], [11, 12])
-        self.assertEqual(result.frames[0]["error"]["code"], -32000)
-        self.assertEqual(result.frames[0]["error"]["message"], "listener boom")
+        self.assertEqual(result.frames[0]["result"]["action"], 0)
+        self.assertNotIn("comment", result.frames[0]["result"])
         self.assertEqual(result.frames[1]["result"]["comment"], "handled")
         self.assertEqual(result.frames[1]["result"]["action"], 0)
+        self.assertIn("processProxyMessage listener failed: listener boom", result.stderr)
 
     def test_extension_can_call_host_while_proxy_request_is_being_handled(self):
         # Both sides number requests from 1, exactly like the real host does.
@@ -285,7 +286,7 @@ class StateListenerTests(unittest.TestCase):
         result = run_bridge(TWO_STATE_LISTENERS)
         self.assertEqual(result.returncode, 0)
         self.assertEqual(events(result), [{"unloaded": True}])
-        self.assertIn("state listener failed: listener failed", result.stderr)
+        self.assertIn("extensionUnloaded listener failed: listener failed", result.stderr)
 
 
 INFO_EXTENSION = r'''

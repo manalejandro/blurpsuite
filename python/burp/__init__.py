@@ -51,6 +51,9 @@ __all__ = [
     "IInterceptedProxyMessage",
     "IRequestInfo",
     "IResponseInfo",
+    "IResponseKeywords",
+    "IResponseVariations",
+    "IMenuItemHandler",
     "IParameter",
     "IHttpHeader",
     "ICookie",
@@ -342,6 +345,39 @@ class IResponseInfo(_Interface):
 
     def getInferredMimeType(self):
         return ""
+
+
+class IResponseKeywords(_Interface):
+    def getInvariantKeywords(self):
+        return []
+
+    def getKeywordCount(self, keyword, responseIndex):
+        return 0
+
+    def getVariantKeywords(self):
+        return []
+
+    def updateWith(self, *responses):
+        pass
+
+
+class IResponseVariations(_Interface):
+    def getAttributeValue(self, attributeName, responseIndex):
+        return 0
+
+    def getInvariantAttributes(self):
+        return []
+
+    def getVariantAttributes(self):
+        return []
+
+    def updateWith(self, *responses):
+        pass
+
+
+class IMenuItemHandler(_Interface):
+    def menuItemClicked(self, menuItemCaption, messageInfo):
+        pass
 
 
 class IParameter(_Interface):

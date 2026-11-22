@@ -5,11 +5,13 @@ import burp.IRequestInfo;
 import burp.IResponseInfo;
 import com.blurpsuite.api.ExtensionHelpersImpl;
 import com.blurpsuite.core.HttpParser;
+import com.blurpsuite.core.ProxyServer;
 import com.blurpsuite.core.Scope;
 import com.blurpsuite.core.Service;
 import com.blurpsuite.util.ByteUtil;
 import com.blurpsuite.util.Json;
 
+import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -206,6 +208,27 @@ public final class CoreTests {
         eq(Json.string(42, "fallback"), "fallback", "string accessor fallback");
         eq(Json.integer(9L, -1), 9, "integer accessor");
         eq(Json.integer("9", -1), -1, "integer accessor fallback");
+    }
+
+    public void testChunkedResponseIsReframed() throws Exception {
+        String raw = "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n"
+                + "5\r\nhello\r\n0\r\n\r\n";
+        String text = ByteUtil.toString(ProxyServer.readMessage(
+                new ByteArrayInputStream(ByteUtil.toBytes(raw)), true));
+
+        eq(text, "HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello",
+                "chunked body is dechunked and re-framed");
+        check(!text.toLowerCase(java.util.Locale.ROOT).contains("transfer-encoding"),
+                "Transfer-Encoding header is removed");
+    }
+
+    public void testCloseDelimitedResponseIsReframed() throws Exception {
+        String raw = "HTTP/1.1 200 OK\r\n\r\nclose-delimited-body";
+        String text = ByteUtil.toString(ProxyServer.readMessage(
+                new ByteArrayInputStream(ByteUtil.toBytes(raw)), true));
+
+        eq(text, "HTTP/1.1 200 OK\r\nContent-Length: 20\r\n\r\nclose-delimited-body",
+                "close-delimited body is read to EOF and re-framed");
     }
 
     private static Map<String, String> parameterMap(IRequestInfo info) {

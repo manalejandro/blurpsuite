@@ -178,6 +178,16 @@ class HttpRequestResponse:
         self._response_markers = [tuple(pair) for pair in response_markers]
 
 
+class _InetAddress(str):
+    """String-compatible stand-in for java.net.InetAddress used by the bridge."""
+
+    def getHostAddress(self) -> str:
+        return str(self)
+
+    def getHostName(self) -> str:
+        return str(self)
+
+
 class InterceptedProxyMessage:
     """Proxy message with a mutable intercept action."""
 
@@ -189,8 +199,8 @@ class InterceptedProxyMessage:
         self._client_address = client_address
         self._action = ACTION_FOLLOW_RULES
 
-    def getClientIpAddress(self) -> str:
-        return self._client_address
+    def getClientIpAddress(self) -> _InetAddress:
+        return _InetAddress(self._client_address)
 
     def getInterceptAction(self) -> int:
         return self._action

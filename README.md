@@ -115,7 +115,9 @@ java -cp build/classes com.blurpsuite.Main \
 A Python extension defines a `BurpExtender` (or `Extension`) class, implements
 `registerExtenderCallbacks`, and may implement listener interfaces such as
 `IProxyListener` and `IExtensionStateListener`. The Java host starts the bridge
-as `python -m blurp.bridge <script>` with `PYTHONPATH` set to `--python-home`.
+as `<python-executable> -m blurp.bridge <script>` with `PYTHONPATH` set to
+`--python-home` (the executable defaults to `python3` and can be changed with
+`--python`).
 
 ## Architecture
 

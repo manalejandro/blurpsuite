@@ -199,7 +199,8 @@ public final class ProxyServer {
             String[] requestLine = HttpParser.startLine(requestBytes);
             String method = requestLine.length > 0 ? requestLine[0].toUpperCase(Locale.ROOT) : "GET";
             if ("CONNECT".equals(method)) {
-                tunnel(client, in, out, requestLine.length > 1 ? requestLine[1] : "");
+                handleConnect(client, in, out, requestBytes,
+                        requestLine.length > 1 ? requestLine[1] : "");
                 return;
             }
 
@@ -272,7 +273,7 @@ public final class ProxyServer {
             OutputStream out = upstream.getOutputStream();
             out.write(request);
             out.flush();
-            return readMessage(upstream.getInputStream());
+            return readMessage(upstream.getInputStream(), true);
         } catch (IOException e) {
             System.err.println("[proxy] upstream " + service + ": " + e.getMessage());
             return null;
@@ -306,8 +307,17 @@ public final class ProxyServer {
         return com.blurpsuite.util.ByteUtil.toBytes(replacement + text.substring(lineEnd));
     }
 
-    /** Reads one HTTP message, honouring Content-Length and chunked transfer encoding. */
+    /** Reads one HTTP/1.1 request, honouring Content-Length and chunked transfer encoding. */
     public static byte[] readMessage(InputStream in) throws IOException {
+        return readMessage(in, false);
+    }
+
+    /**
+     * Reads one HTTP/1.1 message. Response bodies without explicit framing are
+     * read until EOF and rewritten with a Content-Length header.
+     */
+    public static byte[] readMessage(InputStream in, boolean allowCloseDelimitedBody)
+            throws IOException {
         ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
         int current;
         int previous = -1;
@@ -333,38 +343,75 @@ public final class ProxyServer {
         }
         byte[] headers = headerBuffer.toByteArray();
         String headerText = com.blurpsuite.util.ByteUtil.toString(headers).toLowerCase(Locale.ROOT);
-        ByteArrayOutputStream message = new ByteArrayOutputStream();
-        message.write(headers);
-
-        if (headerText.contains("transfer-encoding:") && headerText.contains("chunked")) {
-            readChunks(in, message);
-        } else {
-            int contentLength = 0;
-            for (String line : headerText.split("\\r?\\n")) {
-                if (line.startsWith("content-length:")) {
-                    try {
-                        contentLength = Integer.parseInt(line.substring(15).trim());
-                    } catch (NumberFormatException ignored) {
-                        contentLength = 0;
-                    }
-                    break;
+        boolean chunked = headerText.contains("transfer-encoding:") && headerText.contains("chunked");
+        boolean hasLength = false;
+        int contentLength = 0;
+        for (String line : headerText.split("\\r?\\n")) {
+            if (line.startsWith("content-length:")) {
+                hasLength = true;
+                try {
+                    contentLength = Integer.parseInt(line.substring(15).trim());
+                } catch (NumberFormatException ignored) {
+                    contentLength = 0;
                 }
+                break;
             }
-            if (contentLength < 0 || contentLength > MAX_MESSAGE_SIZE) {
-                throw new IOException("invalid Content-Length: " + contentLength);
-            }
+        }
+        if (chunked && hasLength) {
+            throw new IOException("conflicting Content-Length and Transfer-Encoding");
+        }
+        if (contentLength < 0 || contentLength > MAX_MESSAGE_SIZE) {
+            throw new IOException("invalid Content-Length: " + contentLength);
+        }
+
+        ByteArrayOutputStream body = new ByteArrayOutputStream();
+        if (chunked) {
+            readChunks(in, body);
+        } else if (hasLength) {
             byte[] buffer = new byte[8192];
             int remaining = contentLength;
             while (remaining > 0) {
                 int read = in.read(buffer, 0, Math.min(buffer.length, remaining));
                 if (read < 0) {
-                    break;
+                    throw new IOException("truncated request body");
                 }
-                message.write(buffer, 0, read);
+                body.write(buffer, 0, read);
                 remaining -= read;
             }
+        } else if (allowCloseDelimitedBody) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                body.write(buffer, 0, read);
+                if (body.size() > MAX_MESSAGE_SIZE) {
+                    throw new IOException("body too large");
+                }
+            }
         }
+
+        boolean normalized = chunked || (!hasLength && allowCloseDelimitedBody);
+        ByteArrayOutputStream message = new ByteArrayOutputStream();
+        message.write(normalized ? rewriteContentLength(headers, body.size()) : headers);
+        message.write(body.toByteArray());
         return message.toByteArray();
+    }
+
+    /** Replaces chunked or close-delimited framing with an explicit Content-Length. */
+    private static byte[] rewriteContentLength(byte[] headers, int length) {
+        String text = new String(headers, java.nio.charset.StandardCharsets.ISO_8859_1);
+        String separator = text.contains("\r\n\r\n") ? "\r\n\r\n" : "\n\n";
+        int split = text.indexOf(separator);
+        String headerBlock = split >= 0 ? text.substring(0, split) : text;
+        StringBuilder result = new StringBuilder();
+        for (String line : headerBlock.split("\\r?\\n", -1)) {
+            String lower = line.trim().toLowerCase(Locale.ROOT);
+            if (lower.startsWith("transfer-encoding:") || lower.startsWith("content-length:")) {
+                continue;
+            }
+            result.append(line).append("\r\n");
+        }
+        result.append("Content-Length: ").append(length).append("\r\n\r\n");
+        return result.toString().getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
     }
 
     private static void readChunks(InputStream in, ByteArrayOutputStream out) throws IOException {
@@ -415,11 +462,68 @@ public final class ProxyServer {
         return null;
     }
 
-    private static void tunnel(Socket client, InputStream in, OutputStream out, String target) {
+    private void handleConnect(Socket client, InputStream in, OutputStream out, byte[] requestBytes,
+                               String target) throws IOException {
+        Service service = connectService(target);
+        if (service == null) {
+            writeResponse(out, simpleResponse(400, "Bad Request", "Invalid CONNECT target"));
+            return;
+        }
+        HttpExchange exchange = new HttpExchange(referenceCounter.getAndIncrement(), requestBytes,
+                service, bindAddress + ":" + port,
+                client.getInetAddress() == null ? "" : client.getInetAddress().getHostAddress());
+        history.add(exchange);
+
+        if (!scope.isInScope(connectUrl(service))) {
+            writeResponse(out, simpleResponse(403, "Forbidden", "Target is outside the configured scope"));
+            return;
+        }
+        if (!notifyListeners(true, exchange) || !intercept(exchange, true)) {
+            return;
+        }
+
+        tunnel(client, in, out, service);
+        exchange.setResponse(com.blurpsuite.util.ByteUtil.toBytes(
+                "HTTP/1.1 200 Connection Established\r\n\r\n"));
+        notifyListeners(false, exchange);
+    }
+
+    private static Service connectService(String target) {
+        if (target == null || target.isBlank()) {
+            return null;
+        }
+        String host = target;
+        int port = 443;
+        int colon = target.lastIndexOf(':');
+        if (colon > 0 && target.substring(colon + 1).chars().allMatch(Character::isDigit)) {
+            host = target.substring(0, colon);
+            try {
+                port = Integer.parseInt(target.substring(colon + 1));
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        if (host.isBlank() || port < 1 || port > 65535) {
+            return null;
+        }
+        return new Service(host, port, "https");
+    }
+
+    private static java.net.URL connectUrl(Service service) {
         try {
-            String[] parts = target.split(":", 2);
-            int portNumber = parts.length > 1 ? Integer.parseInt(parts[1]) : 443;
-            try (Socket upstream = new Socket(parts[0], portNumber)) {
+            String authority = service.getHost();
+            if (service.getPort() != 443) {
+                authority += ":" + service.getPort();
+            }
+            return new java.net.URL("https://" + authority + "/");
+        } catch (java.net.MalformedURLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void tunnel(Socket client, InputStream in, OutputStream out, Service service) {
+        try {
+            try (Socket upstream = new Socket(service.getHost(), service.getPort())) {
                 out.write(com.blurpsuite.util.ByteUtil.toBytes("HTTP/1.1 200 Connection Established\r\n\r\n"));
                 out.flush();
                 InputStream upstreamIn = upstream.getInputStream();
@@ -432,8 +536,8 @@ public final class ProxyServer {
                 toClient.start();
                 toClient.join();
             }
-        } catch (IOException | NumberFormatException e) {
-            System.err.println("[proxy] CONNECT to " + target + " failed: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("[proxy] CONNECT to " + service + " failed: " + e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

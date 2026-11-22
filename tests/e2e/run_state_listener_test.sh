@@ -18,11 +18,13 @@ javac --release 17 -d "$BUILD/classes" \
     "$ROOT/tests/e2e/StateListenerExtension.java"
 
 log="${BUILD}/server.log"
-BLURP_TEST_MARKER="$MARKER" java -cp "$BUILD/classes" com.blurpsuite.Main \
+BLURP_TEST_MARKER="$MARKER" BLURP_TEST_ARGS="${BUILD}/args.json" \
+java -cp "$BUILD/classes" com.blurpsuite.Main \
     --headless --port "$PORT" \
     --extension "$BUILD/classes" \
     --extension "$ROOT/tests/e2e/state_listener.py" \
-    --python-home "$ROOT/python" > "$log" 2>&1 &
+    --python-home "$ROOT/python" \
+    --extension-arg alpha --extension-arg beta > "$log" 2>&1 &
 pid=$!
 
 cleanup() {
@@ -62,5 +64,16 @@ for suffix in java python; do
         exit 1
     fi
 done
+
+if [ ! -f "${BUILD}/args.json" ]; then
+    echo "FAIL: Python extension did not receive an extension arguments marker"
+    exit 1
+fi
+args="$(python3 -c 'import json,sys;print(json.dumps(json.load(open(sys.argv[1]))))' \
+    "${BUILD}/args.json")"
+if [ "$args" != '["alpha", "beta"]' ]; then
+    echo "FAIL: Python extension arguments were ${args}, expected [\"alpha\", \"beta\"]"
+    exit 1
+fi
 
 echo "PASS: Java and Python state listeners were notified exactly once on shutdown"

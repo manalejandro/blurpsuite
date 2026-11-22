@@ -64,7 +64,7 @@ public final class ExtensionManager {
         }
         BurpExtenderCallbacksImpl callbacks = newCallbacks(script);
         PythonExtensionHost host = new PythonExtensionHost(callbacks, script, pythonHome,
-                pythonExecutable);
+                pythonExecutable, commandLineArguments);
         // Extension-initiated unloads must go through the manager so the proxy
         // listener and loaded-extension entry are removed as well. The work is
         // asynchronous because this handler runs on the JSON-RPC reader thread,

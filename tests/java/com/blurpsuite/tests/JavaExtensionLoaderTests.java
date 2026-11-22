@@ -10,7 +10,10 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import static com.blurpsuite.tests.TestRunner.check;
 import static com.blurpsuite.tests.TestRunner.eq;
@@ -39,7 +42,7 @@ public final class JavaExtensionLoaderTests {
             var compiler = javax.tools.ToolProvider.getSystemJavaCompiler();
             check(compiler != null, "system Java compiler available");
             int compiled = compiler.run(null, null, null,
-                    "-classpath", System.getProperty("java.class.path"),
+                    "-classpath", compilerClasspath(),
                     "-d", classes.toString(), source.toString());
             eq(compiled, 0, "fixture compiled");
 
@@ -61,6 +64,33 @@ public final class JavaExtensionLoaderTests {
             }
         } finally {
             deleteTree(temp);
+        }
+    }
+
+    /**
+     * Builds a javac classpath from the loaded classes' real code sources.
+     * {@code java.class.path} is the Maven launcher's classpath under
+     * {@code exec:java}, not the project classpath used to load TestRunner.
+     */
+    private static String compilerClasspath() throws Exception {
+        List<String> entries = new ArrayList<>();
+        appendCodeSource(entries, Class.forName("burp.IBurpExtender"));
+        appendCodeSource(entries, JavaExtensionLoaderTests.class);
+        String systemClasspath = System.getProperty("java.class.path", "");
+        if (!systemClasspath.isBlank() && !entries.contains(systemClasspath)) {
+            entries.add(systemClasspath);
+        }
+        return String.join(System.getProperty("path.separator"), entries);
+    }
+
+    private static void appendCodeSource(List<String> entries, Class<?> type) throws Exception {
+        var codeSource = type.getProtectionDomain().getCodeSource();
+        if (codeSource == null || codeSource.getLocation() == null) {
+            return;
+        }
+        String entry = Paths.get(codeSource.getLocation().toURI()).toString();
+        if (!entries.contains(entry)) {
+            entries.add(entry);
         }
     }
 

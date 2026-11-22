@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import io
 import sys
+import threading
 import unittest
 from typing import Any, Callable
 from unittest import mock
 
 from support import frame, parse_frames  # adds the runtime package to sys.path
 
-from blurp.bridge import Transport
+from blurp.bridge import ProtocolStdout, Transport
 
 
 def with_streams(inbound: list[dict[str, Any]], action: Callable[[Transport], Any]):
@@ -22,6 +23,65 @@ def with_streams(inbound: list[dict[str, Any]], action: Callable[[Transport], An
 
 
 class TransportFramingTests(unittest.TestCase):
+    def test_protocol_stdout_redirects_extension_print_to_stderr(self):
+        pipe = io.StringIO()
+        errors = io.StringIO()
+        wrapped = ProtocolStdout(pipe)
+        with mock.patch.object(sys, "stdout", wrapped), mock.patch.object(sys, "stderr", errors):
+            Transport().notify("print_output", {"message": "from extension"})
+            print("noise from extension")
+            sys.stdout.flush()
+        self.assertEqual(len(parse_frames(pipe.getvalue())), 1)
+        self.assertIn("noise from extension", errors.getvalue())
+
+    def test_extension_output_during_frame_write_stays_off_the_rpc_pipe(self):
+        pipe = io.StringIO()
+        errors = io.StringIO()
+
+        class ReentrantPipe:
+            def write(self, text):
+                print("noise during frame", end="")
+                pipe.write(text)
+                return len(text)
+
+            def flush(self):
+                pipe.flush()
+
+            def fileno(self):
+                return pipe.fileno()
+
+        wrapped = ProtocolStdout(ReentrantPipe())
+        with mock.patch.object(sys, "stdout", wrapped), mock.patch.object(sys, "stderr", errors):
+            Transport().notify("ping", {})
+            print("noise after frame")
+        self.assertEqual(len(parse_frames(pipe.getvalue())), 1)
+        self.assertEqual(errors.getvalue().count("noise"), 2)
+
+    def test_concurrent_notifications_are_whole_frames(self):
+        pipe = io.StringIO()
+        errors = io.StringIO()
+        transport = Transport()
+        wrapped = ProtocolStdout(pipe)
+
+        def worker(index: int):
+            for count in range(20):
+                transport.notify("tick", {"worker": index, "count": count})
+                print(f"noise {index}/{count}")
+
+        with mock.patch.object(sys, "stdout", wrapped), mock.patch.object(sys, "stderr", errors):
+            threads = [threading.Thread(target=worker, args=(index,)) for index in range(4)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+        frames = parse_frames(pipe.getvalue())
+        self.assertEqual(len(frames), 80)
+        self.assertEqual({(frame["params"]["worker"], frame["params"]["count"])
+                          for frame in frames},
+                         {(index, count) for index in range(4) for count in range(20)})
+        self.assertEqual(errors.getvalue().count("noise"), 80)
+
     def test_call_sends_compact_request_and_matches_response_ids(self):
         # The reply to the second call arrives first; demultiplexing is by id.
         inbound = [

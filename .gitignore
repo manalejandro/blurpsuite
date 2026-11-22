@@ -1,0 +1,28 @@
+# Build outputs
+build/
+target/
+out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Gradle
+.gradle/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Editors and OS files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+*.swp
+
+# Local configuration and logs
+.env
+*.log

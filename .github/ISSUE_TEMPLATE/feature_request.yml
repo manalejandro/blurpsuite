@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest an improvement or new capability for Blurp Suite
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The roadmap in docs/ROADMAP.md lists planned work. Please check it first
+        and describe the problem you are trying to solve, not only the solution.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What are you unable to do today, and who is affected?
+      placeholder: I cannot inspect HTTPS responses because CONNECT is tunnelled...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior you would like and any API or CLI changes.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches or workarounds have you tried?
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Proxy / HTTP
+        - Java extension API
+        - Python extension bridge
+        - Desktop UI
+        - Build / CI
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: compatibility
+    attributes:
+      label: Compatibility
+      options:
+        - label: This does not require copying PortSwigger source code
+          required: true
+        - label: I am willing to help implement or test this
+          required: false

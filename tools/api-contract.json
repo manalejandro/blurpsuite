@@ -1,0 +1,1653 @@
+{
+  "IBurpCollaboratorClientContext": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.util.List<IBurpCollaboratorInteraction> fetchAllCollaboratorInteractions()",
+        "description": "This method is used to retrieve all interactions received by the Collaborator server resulting from payloads that were generated for this context."
+      },
+      {
+        "signature": "java.util.List<IBurpCollaboratorInteraction> fetchAllInfiltratorInteractions()",
+        "description": "This method is used to retrieve all interactions made by Burp Infiltrator instrumentation resulting from payloads that were generated for this context."
+      },
+      {
+        "signature": "java.util.List<IBurpCollaboratorInteraction> fetchCollaboratorInteractionsFor(java.lang.String payload)",
+        "description": "This method is used to retrieve interactions received by the Collaborator server resulting from a single payload that was generated for this context."
+      },
+      {
+        "signature": "java.util.List<IBurpCollaboratorInteraction> fetchInfiltratorInteractionsFor(java.lang.String payload)",
+        "description": "This method is used to retrieve interactions made by Burp Infiltrator instrumentation resulting from a single payload that was generated for this context."
+      },
+      {
+        "signature": "java.lang.String generatePayload(boolean includeCollaboratorServerLocation)",
+        "description": "This method is used to generate new Burp Collaborator payloads."
+      },
+      {
+        "signature": "java.lang.String getCollaboratorServerLocation()",
+        "description": "This method is used to retrieve the network location of the Collaborator server."
+      }
+    ]
+  },
+  "IBurpCollaboratorInteraction": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.util.Map<java.lang.String,java.lang.String> getProperties()",
+        "description": "This method is used to retrieve a map containing all properties of the interaction."
+      },
+      {
+        "signature": "java.lang.String getProperty(java.lang.String name)",
+        "description": "This method is used to retrieve a property of the interaction."
+      }
+    ]
+  },
+  "IBurpExtender": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks)",
+        "description": "This method is invoked when the extension is loaded."
+      }
+    ]
+  },
+  "IBurpExtenderCallbacks": {
+    "extends": [],
+    "fields": [
+      {
+        "name": "TOOL_COMPARER",
+        "type": "int",
+        "value": "512"
+      },
+      {
+        "name": "TOOL_DECODER",
+        "type": "int",
+        "value": "256"
+      },
+      {
+        "name": "TOOL_EXTENDER",
+        "type": "int",
+        "value": "1024"
+      },
+      {
+        "name": "TOOL_INTRUDER",
+        "type": "int",
+        "value": "32"
+      },
+      {
+        "name": "TOOL_PROXY",
+        "type": "int",
+        "value": "4"
+      },
+      {
+        "name": "TOOL_REPEATER",
+        "type": "int",
+        "value": "64"
+      },
+      {
+        "name": "TOOL_SCANNER",
+        "type": "int",
+        "value": "16"
+      },
+      {
+        "name": "TOOL_SEQUENCER",
+        "type": "int",
+        "value": "128"
+      },
+      {
+        "name": "TOOL_SPIDER",
+        "type": "int",
+        "value": "8"
+      },
+      {
+        "name": "TOOL_SUITE",
+        "type": "int",
+        "value": "1"
+      },
+      {
+        "name": "TOOL_TARGET",
+        "type": "int",
+        "value": "2"
+      }
+    ],
+    "methods": [
+      {
+        "signature": "void addScanIssue(IScanIssue issue)",
+        "description": "This method is used to register a new Scanner issue."
+      },
+      {
+        "signature": "void addSuiteTab(ITab tab)",
+        "description": "This method is used to add a custom tab to the main Burp Suite window."
+      },
+      {
+        "signature": "void addToSiteMap(IHttpRequestResponse item)",
+        "description": "This method can be used to add an item to Burp's site map with the specified request/response details."
+      },
+      {
+        "signature": "IHttpRequestResponseWithMarkers applyMarkers(IHttpRequestResponse httpRequestResponse, java.util.List<int[]> requestMarkers, java.util.List<int[]> responseMarkers)",
+        "description": "This method is used to apply markers to an HTTP request or response, at offsets into the message that are relevant for some particular purpose."
+      },
+      {
+        "signature": "IBurpCollaboratorClientContext createBurpCollaboratorClientContext()",
+        "description": "This method is used to create a new Burp Collaborator client context, which can be used to generate Burp Collaborator payloads and poll the Collaborator server for any network interactions that result from using those payloads."
+      },
+      {
+        "signature": "IMessageEditor createMessageEditor(IMessageEditorController controller, boolean editable)",
+        "description": "This method is used to create a new instance of Burp's HTTP message editor, for the extension to use in its own UI."
+      },
+      {
+        "signature": "ITextEditor createTextEditor()",
+        "description": "This method is used to create a new instance of Burp's plain text editor, for the extension to use in its own UI."
+      },
+      {
+        "signature": "void customizeUiComponent(java.awt.Component component)",
+        "description": "This method is used to customize UI components in line with Burp's UI style, including font size, colors, table line spacing, etc."
+      },
+      {
+        "signature": "IScanQueueItem doActiveScan(java.lang.String host, int port, boolean useHttps, byte[] request)",
+        "description": "This method can be used to send an HTTP request to the Burp Scanner tool to perform an active vulnerability scan."
+      },
+      {
+        "signature": "IScanQueueItem doActiveScan(java.lang.String host, int port, boolean useHttps, byte[] request, java.util.List<int[]> insertionPointOffsets)",
+        "description": "This method can be used to send an HTTP request to the Burp Scanner tool to perform an active vulnerability scan, based on a custom list of insertion points that are to be scanned."
+      },
+      {
+        "signature": "void doPassiveScan(java.lang.String host, int port, boolean useHttps, byte[] request, byte[] response)",
+        "description": "This method can be used to send an HTTP request to the Burp Scanner tool to perform a passive vulnerability scan."
+      },
+      {
+        "signature": "void excludeFromScope(java.net.URL url)",
+        "description": "This method can be used to exclude the specified URL from the Suite-wide scope."
+      },
+      {
+        "signature": "void exitSuite(boolean promptUser)",
+        "description": "This method can be used to shut down Burp programmatically, with an optional prompt to the user."
+      },
+      {
+        "signature": "void generateScanReport(java.lang.String format, IScanIssue[] issues, java.io.File file)",
+        "description": "This method is used to generate a report for the specified Scanner issues."
+      },
+      {
+        "signature": "java.lang.String[] getBurpVersion()",
+        "description": "This method retrieves information about the version of Burp in which the extension is running."
+      },
+      {
+        "signature": "java.lang.String[] getCommandLineArguments()",
+        "description": "This method returns the command line arguments that were passed to Burp on startup."
+      },
+      {
+        "signature": "java.util.List<IContextMenuFactory> getContextMenuFactories()",
+        "description": "This method is used to retrieve the context menu factories that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<ICookie> getCookieJarContents()",
+        "description": "This method is used to retrieve the contents of Burp's session handling cookie jar."
+      },
+      {
+        "signature": "java.lang.String getExtensionFilename()",
+        "description": "This method retrieves the absolute path name of the file from which the current extension was loaded."
+      },
+      {
+        "signature": "java.util.List<IExtensionStateListener> getExtensionStateListeners()",
+        "description": "This method is used to retrieve the extension state listeners that are registered by the extension."
+      },
+      {
+        "signature": "java.lang.String[] getHeaders(byte[] message)",
+        "description": "Deprecated. Use IExtensionHelpers.analyzeRequest() or IExtensionHelpers.analyzeResponse() instead."
+      },
+      {
+        "signature": "IExtensionHelpers getHelpers()",
+        "description": "This method is used to obtain an IExtensionHelpers object, which can be used by the extension to perform numerous useful tasks."
+      },
+      {
+        "signature": "java.util.List<IHttpListener> getHttpListeners()",
+        "description": "This method is used to retrieve the HTTP listeners that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<IIntruderPayloadGeneratorFactory> getIntruderPayloadGeneratorFactories()",
+        "description": "This method is used to retrieve the Intruder payload generator factories that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<IIntruderPayloadProcessor> getIntruderPayloadProcessors()",
+        "description": "This method is used to retrieve the Intruder payload processors that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<IMessageEditorTabFactory> getMessageEditorTabFactories()",
+        "description": "This method is used to retrieve the message editor tab factories that are registered by the extension."
+      },
+      {
+        "signature": "java.lang.String[][] getParameters(byte[] request)",
+        "description": "Deprecated. Use IExtensionHelpers.analyzeRequest() instead."
+      },
+      {
+        "signature": "IHttpRequestResponse[] getProxyHistory()",
+        "description": "This method returns details of all items in the Proxy history."
+      },
+      {
+        "signature": "java.util.List<IProxyListener> getProxyListeners()",
+        "description": "This method is used to retrieve the Proxy listeners that are registered by the extension."
+      },
+      {
+        "signature": "IScanIssue[] getScanIssues(java.lang.String urlPrefix)",
+        "description": "This method returns all of the current scan issues for URLs matching the specified literal prefix."
+      },
+      {
+        "signature": "java.util.List<IScannerCheck> getScannerChecks()",
+        "description": "This method is used to retrieve the Scanner checks that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<IScannerInsertionPointProvider> getScannerInsertionPointProviders()",
+        "description": "This method is used to retrieve the Scanner insertion point providers that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<IScannerListener> getScannerListeners()",
+        "description": "This method is used to retrieve the Scanner listeners that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<IScopeChangeListener> getScopeChangeListeners()",
+        "description": "This method is used to retrieve the scope change listeners that are registered by the extension."
+      },
+      {
+        "signature": "java.util.List<ISessionHandlingAction> getSessionHandlingActions()",
+        "description": "This method is used to retrieve the session handling actions that are registered by the extension."
+      },
+      {
+        "signature": "IHttpRequestResponse[] getSiteMap(java.lang.String urlPrefix)",
+        "description": "This method returns details of items in the site map."
+      },
+      {
+        "signature": "java.io.OutputStream getStderr()",
+        "description": "This method is used to obtain the current extension's standard error stream."
+      },
+      {
+        "signature": "java.io.OutputStream getStdout()",
+        "description": "This method is used to obtain the current extension's standard output stream."
+      },
+      {
+        "signature": "java.lang.String getToolName(int toolFlag)",
+        "description": "This method is used to obtain the descriptive name for the Burp tool identified by the tool flag provided."
+      },
+      {
+        "signature": "void includeInScope(java.net.URL url)",
+        "description": "This method can be used to include the specified URL in the Suite-wide scope."
+      },
+      {
+        "signature": "boolean isExtensionBapp()",
+        "description": "This method determines whether the current extension was loaded as a BApp (a Burp App from the BApp Store)."
+      },
+      {
+        "signature": "boolean isInScope(java.net.URL url)",
+        "description": "This method can be used to query whether a specified URL is within the current Suite-wide scope."
+      },
+      {
+        "signature": "void issueAlert(java.lang.String message)",
+        "description": "This method can be used to display a specified message in the Burp Suite alerts tab."
+      },
+      {
+        "signature": "void loadConfig(java.util.Map<java.lang.String,java.lang.String> config)",
+        "description": "Deprecated. Use loadConfigFromJson() instead."
+      },
+      {
+        "signature": "void loadConfigFromJson(java.lang.String config)",
+        "description": "This method causes Burp to load a new project-level configuration from the JSON String provided."
+      },
+      {
+        "signature": "java.lang.String loadExtensionSetting(java.lang.String name)",
+        "description": "This method is used to load configuration settings for the extension that were saved using the method saveExtensionSetting()."
+      },
+      {
+        "signature": "byte[] makeHttp2Request(IHttpService httpService, java.util.List<IHttpHeader> headers, byte[] body)",
+        "description": "This method can be used to issue HTTP/2 requests and retrieve their responses."
+      },
+      {
+        "signature": "byte[] makeHttp2Request(IHttpService httpService, java.util.List<IHttpHeader> headers, byte[] body, boolean forceHttp2)",
+        "description": "This method can be used to issue HTTP/2 requests and retrieve their responses."
+      },
+      {
+        "signature": "byte[] makeHttp2Request(IHttpService httpService, java.util.List<IHttpHeader> headers, byte[] body, boolean forceHttp2, java.lang.String connectionIdentifier)",
+        "description": "This method can be used to issue HTTP/2 requests and retrieve their responses."
+      },
+      {
+        "signature": "IHttpRequestResponse makeHttpRequest(IHttpService httpService, byte[] request)",
+        "description": "This method can be used to issue HTTP requests and retrieve their responses."
+      },
+      {
+        "signature": "IHttpRequestResponse makeHttpRequest(IHttpService httpService, byte[] request, boolean forceHttp1)",
+        "description": "This method can be used to issue HTTP requests and retrieve their responses."
+      },
+      {
+        "signature": "byte[] makeHttpRequest(java.lang.String host, int port, boolean useHttps, byte[] request)",
+        "description": "This method can be used to issue HTTP requests and retrieve their responses."
+      },
+      {
+        "signature": "byte[] makeHttpRequest(java.lang.String host, int port, boolean useHttps, byte[] request, boolean forceHttp1)",
+        "description": "This method can be used to issue HTTP requests and retrieve their responses."
+      },
+      {
+        "signature": "void printError(java.lang.String error)",
+        "description": "This method prints a line of output to the current extension's standard error stream."
+      },
+      {
+        "signature": "void printOutput(java.lang.String output)",
+        "description": "This method prints a line of output to the current extension's standard output stream."
+      },
+      {
+        "signature": "void registerContextMenuFactory(IContextMenuFactory factory)",
+        "description": "This method is used to register a factory for custom context menu items."
+      },
+      {
+        "signature": "void registerExtensionStateListener(IExtensionStateListener listener)",
+        "description": "This method is used to register a listener which will be notified of changes to the extension's state."
+      },
+      {
+        "signature": "void registerHttpListener(IHttpListener listener)",
+        "description": "This method is used to register a listener which will be notified of requests and responses made by any Burp tool."
+      },
+      {
+        "signature": "void registerIntruderPayloadGeneratorFactory(IIntruderPayloadGeneratorFactory factory)",
+        "description": "This method is used to register a factory for Intruder payloads."
+      },
+      {
+        "signature": "void registerIntruderPayloadProcessor(IIntruderPayloadProcessor processor)",
+        "description": "This method is used to register a custom Intruder payload processor."
+      },
+      {
+        "signature": "void registerMenuItem(java.lang.String menuItemCaption, IMenuItemHandler menuItemHandler)",
+        "description": "Deprecated. Use registerContextMenuFactory() instead."
+      },
+      {
+        "signature": "void registerMessageEditorTabFactory(IMessageEditorTabFactory factory)",
+        "description": "This method is used to register a factory for custom message editor tabs."
+      },
+      {
+        "signature": "void registerProxyListener(IProxyListener listener)",
+        "description": "This method is used to register a listener which will be notified of requests and responses being processed by the Proxy tool."
+      },
+      {
+        "signature": "void registerScannerCheck(IScannerCheck check)",
+        "description": "This method is used to register a custom Scanner check."
+      },
+      {
+        "signature": "void registerScannerInsertionPointProvider(IScannerInsertionPointProvider provider)",
+        "description": "This method is used to register a provider of Scanner insertion points."
+      },
+      {
+        "signature": "void registerScannerListener(IScannerListener listener)",
+        "description": "This method is used to register a listener which will be notified of new issues that are reported by the Scanner tool."
+      },
+      {
+        "signature": "void registerScopeChangeListener(IScopeChangeListener listener)",
+        "description": "This method is used to register a listener which will be notified of changes to Burp's suite-wide target scope."
+      },
+      {
+        "signature": "void registerSessionHandlingAction(ISessionHandlingAction action)",
+        "description": "This method is used to register a custom session handling action."
+      },
+      {
+        "signature": "void removeContextMenuFactory(IContextMenuFactory factory)",
+        "description": "This method is used to remove a context menu factory that has been registered by the extension."
+      },
+      {
+        "signature": "void removeExtensionStateListener(IExtensionStateListener listener)",
+        "description": "This method is used to remove an extension state listener that has been registered by the extension."
+      },
+      {
+        "signature": "void removeHttpListener(IHttpListener listener)",
+        "description": "This method is used to remove an HTTP listener that has been registered by the extension."
+      },
+      {
+        "signature": "void removeIntruderPayloadGeneratorFactory(IIntruderPayloadGeneratorFactory factory)",
+        "description": "This method is used to remove an Intruder payload generator factory that has been registered by the extension."
+      },
+      {
+        "signature": "void removeIntruderPayloadProcessor(IIntruderPayloadProcessor processor)",
+        "description": "This method is used to remove an Intruder payload processor that has been registered by the extension."
+      },
+      {
+        "signature": "void removeMessageEditorTabFactory(IMessageEditorTabFactory factory)",
+        "description": "This method is used to remove a message editor tab factory that has been registered by the extension."
+      },
+      {
+        "signature": "void removeProxyListener(IProxyListener listener)",
+        "description": "This method is used to remove a Proxy listener that has been registered by the extension."
+      },
+      {
+        "signature": "void removeScannerCheck(IScannerCheck check)",
+        "description": "This method is used to remove a Scanner check that has been registered by the extension."
+      },
+      {
+        "signature": "void removeScannerInsertionPointProvider(IScannerInsertionPointProvider provider)",
+        "description": "This method is used to remove a Scanner insertion point provider that has been registered by the extension."
+      },
+      {
+        "signature": "void removeScannerListener(IScannerListener listener)",
+        "description": "This method is used to remove a Scanner listener that has been registered by the extension."
+      },
+      {
+        "signature": "void removeScopeChangeListener(IScopeChangeListener listener)",
+        "description": "This method is used to remove a scope change listener that has been registered by the extension."
+      },
+      {
+        "signature": "void removeSessionHandlingAction(ISessionHandlingAction action)",
+        "description": "This method is used to remove a session handling action that has been registered by the extension."
+      },
+      {
+        "signature": "void removeSuiteTab(ITab tab)",
+        "description": "This method is used to remove a previously-added tab from the main Burp Suite window."
+      },
+      {
+        "signature": "void restoreState(java.io.File file)",
+        "description": "Deprecated. State files have been replaced with Burp project files."
+      },
+      {
+        "signature": "IHttpRequestResponsePersisted saveBuffersToTempFiles(IHttpRequestResponse httpRequestResponse)",
+        "description": "This method is used to save the request and response of an IHttpRequestResponse object to temporary files, so that they are no longer held in memory."
+      },
+      {
+        "signature": "java.util.Map<java.lang.String,java.lang.String> saveConfig()",
+        "description": "Deprecated. Use saveConfigAsJson() instead."
+      },
+      {
+        "signature": "java.lang.String saveConfigAsJson(java.lang.String... configPaths)",
+        "description": "This method causes Burp to save its current project-level configuration in JSON format."
+      },
+      {
+        "signature": "void saveExtensionSetting(java.lang.String name, java.lang.String value)",
+        "description": "This method is used to save configuration settings for the extension in a persistent way that survives reloads of the extension and of Burp Suite."
+      },
+      {
+        "signature": "void saveState(java.io.File file)",
+        "description": "Deprecated. State files have been replaced with Burp project files."
+      },
+      {
+        "signature": "ITempFile saveToTempFile(byte[] buffer)",
+        "description": "This method is used to create a temporary file on disk containing the provided data."
+      },
+      {
+        "signature": "void sendToComparer(byte[] data)",
+        "description": "This method can be used to send data to the Comparer tool."
+      },
+      {
+        "signature": "void sendToIntruder(java.lang.String host, int port, boolean useHttps, byte[] request)",
+        "description": "This method can be used to send an HTTP request to the Burp Intruder tool."
+      },
+      {
+        "signature": "void sendToIntruder(java.lang.String host, int port, boolean useHttps, byte[] request, java.util.List<int[]> payloadPositionOffsets)",
+        "description": "This method can be used to send an HTTP request to the Burp Intruder tool."
+      },
+      {
+        "signature": "void sendToRepeater(java.lang.String host, int port, boolean useHttps, byte[] request, java.lang.String tabCaption)",
+        "description": "This method can be used to send an HTTP request to the Burp Repeater tool."
+      },
+      {
+        "signature": "void sendToSpider(java.net.URL url)",
+        "description": "This method can be used to send a seed URL to the Burp Spider tool."
+      },
+      {
+        "signature": "void setExtensionName(java.lang.String name)",
+        "description": "This method is used to set the display name for the current extension, which will be displayed within the user interface for the Extender tool."
+      },
+      {
+        "signature": "void setProxyInterceptionEnabled(boolean enabled)",
+        "description": "This method sets the master interception mode for Burp Proxy."
+      },
+      {
+        "signature": "void unloadExtension()",
+        "description": "This method is used to unload the extension from Burp Suite."
+      },
+      {
+        "signature": "void updateCookieJar(ICookie cookie)",
+        "description": "This method is used to update the contents of Burp's session handling cookie jar."
+      }
+    ]
+  },
+  "IContextMenuFactory": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.util.List<javax.swing.JMenuItem> createMenuItems(IContextMenuInvocation invocation)",
+        "description": "This method will be called by Burp when the user invokes a context menu anywhere within Burp."
+      }
+    ]
+  },
+  "IContextMenuInvocation": {
+    "extends": [],
+    "fields": [
+      {
+        "name": "CONTEXT_INTRUDER_ATTACK_RESULTS",
+        "type": "byte",
+        "value": "9"
+      },
+      {
+        "name": "CONTEXT_INTRUDER_PAYLOAD_POSITIONS",
+        "type": "byte",
+        "value": "8"
+      },
+      {
+        "name": "CONTEXT_MESSAGE_EDITOR_REQUEST",
+        "type": "byte",
+        "value": "0"
+      },
+      {
+        "name": "CONTEXT_MESSAGE_EDITOR_RESPONSE",
+        "type": "byte",
+        "value": "1"
+      },
+      {
+        "name": "CONTEXT_MESSAGE_VIEWER_REQUEST",
+        "type": "byte",
+        "value": "2"
+      },
+      {
+        "name": "CONTEXT_MESSAGE_VIEWER_RESPONSE",
+        "type": "byte",
+        "value": "3"
+      },
+      {
+        "name": "CONTEXT_PROXY_HISTORY",
+        "type": "byte",
+        "value": "6"
+      },
+      {
+        "name": "CONTEXT_SCANNER_RESULTS",
+        "type": "byte",
+        "value": "7"
+      },
+      {
+        "name": "CONTEXT_SEARCH_RESULTS",
+        "type": "byte",
+        "value": "10"
+      },
+      {
+        "name": "CONTEXT_TARGET_SITE_MAP_TABLE",
+        "type": "byte",
+        "value": "5"
+      },
+      {
+        "name": "CONTEXT_TARGET_SITE_MAP_TREE",
+        "type": "byte",
+        "value": "4"
+      }
+    ],
+    "methods": [
+      {
+        "signature": "java.awt.event.InputEvent getInputEvent()",
+        "description": "This method can be used to retrieve the native Java input event that was the trigger for the context menu invocation."
+      },
+      {
+        "signature": "byte getInvocationContext()",
+        "description": "This method can be used to retrieve the context within which the menu was invoked."
+      },
+      {
+        "signature": "IScanIssue[] getSelectedIssues()",
+        "description": "This method can be used to retrieve details of the Scanner issues that were selected by the user when the context menu was invoked."
+      },
+      {
+        "signature": "IHttpRequestResponse[] getSelectedMessages()",
+        "description": "This method can be used to retrieve details of the HTTP requests / responses that were shown or selected by the user when the context menu was invoked."
+      },
+      {
+        "signature": "int[] getSelectionBounds()",
+        "description": "This method can be used to retrieve the bounds of the user's selection into the current message, if applicable."
+      },
+      {
+        "signature": "int getToolFlag()",
+        "description": "This method can be used to retrieve the Burp tool within which the context menu was invoked."
+      }
+    ]
+  },
+  "ICookie": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getDomain()",
+        "description": "This method is used to retrieve the domain for which the cookie is in scope."
+      },
+      {
+        "signature": "java.util.Date getExpiration()",
+        "description": "This method is used to retrieve the expiration time for the cookie."
+      },
+      {
+        "signature": "java.lang.String getName()",
+        "description": "This method is used to retrieve the name of the cookie."
+      },
+      {
+        "signature": "java.lang.String getPath()",
+        "description": "This method is used to retrieve the path for which the cookie is in scope."
+      },
+      {
+        "signature": "java.lang.String getValue()",
+        "description": "This method is used to retrieve the value of the cookie."
+      }
+    ]
+  },
+  "IExtensionHelpers": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "byte[] addParameter(byte[] request, IParameter parameter)",
+        "description": "This method adds a new parameter to an HTTP request, and if appropriate updates the Content-Length header."
+      },
+      {
+        "signature": "IRequestInfo analyzeRequest(byte[] request)",
+        "description": "This method can be used to analyze an HTTP request, and obtain various key details about it."
+      },
+      {
+        "signature": "IRequestInfo analyzeRequest(IHttpRequestResponse request)",
+        "description": "This method can be used to analyze an HTTP request, and obtain various key details about it."
+      },
+      {
+        "signature": "IRequestInfo analyzeRequest(IHttpService httpService, byte[] request)",
+        "description": "This method can be used to analyze an HTTP request, and obtain various key details about it."
+      },
+      {
+        "signature": "IResponseInfo analyzeResponse(byte[] response)",
+        "description": "This method can be used to analyze an HTTP response, and obtain various key details about it."
+      },
+      {
+        "signature": "IResponseKeywords analyzeResponseKeywords(java.util.List<java.lang.String> keywords, byte[]... responses)",
+        "description": "This method analyzes one or more responses to identify the number of occurrences of the specified keywords and returns an IResponseKeywords object that can be queried to obtain details of the number of occurrences of each keyword."
+      },
+      {
+        "signature": "IResponseVariations analyzeResponseVariations(byte[]... responses)",
+        "description": "This method analyzes one or more responses to identify variations in a number of attributes and returns an IResponseVariations object that can be queried to obtain details of the variations."
+      },
+      {
+        "signature": "byte[] base64Decode(byte[] data)",
+        "description": "This method can be used to Base64-decode the specified data."
+      },
+      {
+        "signature": "byte[] base64Decode(java.lang.String data)",
+        "description": "This method can be used to Base64-decode the specified data."
+      },
+      {
+        "signature": "java.lang.String base64Encode(byte[] data)",
+        "description": "This method can be used to Base64-encode the specified data."
+      },
+      {
+        "signature": "java.lang.String base64Encode(java.lang.String data)",
+        "description": "This method can be used to Base64-encode the specified data."
+      },
+      {
+        "signature": "IHttpHeader buildHeader(java.lang.String name, java.lang.String value)",
+        "description": "This method constructs an IHttpHeader object based on the details provided."
+      },
+      {
+        "signature": "byte[] buildHttpMessage(java.util.List<java.lang.String> headers, byte[] body)",
+        "description": "This method builds an HTTP message containing the specified headers and message body."
+      },
+      {
+        "signature": "byte[] buildHttpRequest(java.net.URL url)",
+        "description": "This method creates a GET request to the specified URL."
+      },
+      {
+        "signature": "IHttpService buildHttpService(java.lang.String host, int port, boolean useHttps)",
+        "description": "This method constructs an IHttpService object based on the details provided."
+      },
+      {
+        "signature": "IHttpService buildHttpService(java.lang.String host, int port, java.lang.String protocol)",
+        "description": "This method constructs an IHttpService object based on the details provided."
+      },
+      {
+        "signature": "IParameter buildParameter(java.lang.String name, java.lang.String value, byte type)",
+        "description": "This method constructs an IParameter object based on the details provided."
+      },
+      {
+        "signature": "java.lang.String bytesToString(byte[] data)",
+        "description": "This method can be used to convert data from an array of bytes into String form."
+      },
+      {
+        "signature": "IParameter getRequestParameter(byte[] request, java.lang.String parameterName)",
+        "description": "This method can be used to retrieve details of a specified parameter within an HTTP request."
+      },
+      {
+        "signature": "int indexOf(byte[] data, byte[] pattern, boolean caseSensitive, int from, int to)",
+        "description": "This method searches a piece of data for the first occurrence of a specified pattern."
+      },
+      {
+        "signature": "IScannerInsertionPoint makeScannerInsertionPoint(java.lang.String insertionPointName, byte[] baseRequest, int from, int to)",
+        "description": "This method constructs an IScannerInsertionPoint object based on the details provided."
+      },
+      {
+        "signature": "byte[] removeParameter(byte[] request, IParameter parameter)",
+        "description": "This method removes a parameter from an HTTP request, and if appropriate updates the Content-Length header."
+      },
+      {
+        "signature": "byte[] stringToBytes(java.lang.String data)",
+        "description": "This method can be used to convert data from String form into an array of bytes."
+      },
+      {
+        "signature": "byte[] toggleRequestMethod(byte[] request)",
+        "description": "This method can be used to toggle a request's method between GET and POST."
+      },
+      {
+        "signature": "byte[] updateParameter(byte[] request, IParameter parameter)",
+        "description": "This method updates the value of a parameter within an HTTP request, and if appropriate updates the Content-Length header."
+      },
+      {
+        "signature": "byte[] urlDecode(byte[] data)",
+        "description": "This method can be used to URL-decode the specified data."
+      },
+      {
+        "signature": "java.lang.String urlDecode(java.lang.String data)",
+        "description": "This method can be used to URL-decode the specified data."
+      },
+      {
+        "signature": "byte[] urlEncode(byte[] data)",
+        "description": "This method can be used to URL-encode the specified data."
+      },
+      {
+        "signature": "java.lang.String urlEncode(java.lang.String data)",
+        "description": "This method can be used to URL-encode the specified data."
+      }
+    ]
+  },
+  "IExtensionStateListener": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void extensionUnloaded()",
+        "description": "This method is called when the extension is unloaded."
+      }
+    ]
+  },
+  "IHttpHeader": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getName()",
+        "description": "This method is used to retrieve the name of the header."
+      },
+      {
+        "signature": "java.lang.String getValue()",
+        "description": "This method is used to retrieve the value of the header."
+      }
+    ]
+  },
+  "IHttpListener": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo)",
+        "description": "This method is invoked when an HTTP request is about to be issued, and when an HTTP response has been received."
+      }
+    ]
+  },
+  "IHttpRequestResponse": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getComment()",
+        "description": "This method is used to retrieve the user-annotated comment for this item, if applicable."
+      },
+      {
+        "signature": "java.lang.String getHighlight()",
+        "description": "This method is used to retrieve the user-annotated highlight for this item, if applicable."
+      },
+      {
+        "signature": "IHttpService getHttpService()",
+        "description": "This method is used to retrieve the HTTP service for this request / response."
+      },
+      {
+        "signature": "byte[] getRequest()",
+        "description": "This method is used to retrieve the request message."
+      },
+      {
+        "signature": "byte[] getResponse()",
+        "description": "This method is used to retrieve the response message."
+      },
+      {
+        "signature": "void setComment(java.lang.String comment)",
+        "description": "This method is used to update the user-annotated comment for this item."
+      },
+      {
+        "signature": "void setHighlight(java.lang.String color)",
+        "description": "This method is used to update the user-annotated highlight for this item."
+      },
+      {
+        "signature": "void setHttpService(IHttpService httpService)",
+        "description": "This method is used to update the HTTP service for this request / response."
+      },
+      {
+        "signature": "void setRequest(byte[] message)",
+        "description": "This method is used to update the request message."
+      },
+      {
+        "signature": "void setResponse(byte[] message)",
+        "description": "This method is used to update the response message."
+      }
+    ]
+  },
+  "IHttpRequestResponsePersisted": {
+    "extends": [
+      "IHttpRequestResponse"
+    ],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void deleteTempFiles()",
+        "description": "Deprecated."
+      }
+    ]
+  },
+  "IHttpRequestResponseWithMarkers": {
+    "extends": [
+      "IHttpRequestResponse"
+    ],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.util.List<int[]> getRequestMarkers()",
+        "description": "This method returns the details of the request markers."
+      },
+      {
+        "signature": "java.util.List<int[]> getResponseMarkers()",
+        "description": "This method returns the details of the response markers."
+      }
+    ]
+  },
+  "IHttpService": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getHost()",
+        "description": "This method returns the hostname or IP address for the service."
+      },
+      {
+        "signature": "int getPort()",
+        "description": "This method returns the port number for the service."
+      },
+      {
+        "signature": "java.lang.String getProtocol()",
+        "description": "This method returns the protocol for the service."
+      }
+    ]
+  },
+  "IInterceptedProxyMessage": {
+    "extends": [],
+    "fields": [
+      {
+        "name": "ACTION_DO_INTERCEPT",
+        "type": "int",
+        "value": "1"
+      },
+      {
+        "name": "ACTION_DO_INTERCEPT_AND_REHOOK",
+        "type": "int",
+        "value": "17"
+      },
+      {
+        "name": "ACTION_DONT_INTERCEPT",
+        "type": "int",
+        "value": "2"
+      },
+      {
+        "name": "ACTION_DONT_INTERCEPT_AND_REHOOK",
+        "type": "int",
+        "value": "18"
+      },
+      {
+        "name": "ACTION_DROP",
+        "type": "int",
+        "value": "3"
+      },
+      {
+        "name": "ACTION_FOLLOW_RULES",
+        "type": "int",
+        "value": "0"
+      },
+      {
+        "name": "ACTION_FOLLOW_RULES_AND_REHOOK",
+        "type": "int",
+        "value": "16"
+      }
+    ],
+    "methods": [
+      {
+        "signature": "java.net.InetAddress getClientIpAddress()",
+        "description": "This method retrieves the client IP address from which the request for the intercepted message was received."
+      },
+      {
+        "signature": "int getInterceptAction()",
+        "description": "This method retrieves the currently defined interception action."
+      },
+      {
+        "signature": "java.lang.String getListenerInterface()",
+        "description": "This method retrieves the name of the Burp Proxy listener that is processing the intercepted message."
+      },
+      {
+        "signature": "IHttpRequestResponse getMessageInfo()",
+        "description": "This method retrieves details of the intercepted message."
+      },
+      {
+        "signature": "int getMessageReference()",
+        "description": "This method retrieves a unique reference number for this request/response."
+      },
+      {
+        "signature": "void setInterceptAction(int interceptAction)",
+        "description": "This method is used to update the interception action."
+      }
+    ]
+  },
+  "IIntruderAttack": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "IHttpService getHttpService()",
+        "description": "This method is used to retrieve the HTTP service for the attack."
+      },
+      {
+        "signature": "byte[] getRequestTemplate()",
+        "description": "This method is used to retrieve the request template for the attack."
+      }
+    ]
+  },
+  "IIntruderPayloadGenerator": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "byte[] getNextPayload(byte[] baseValue)",
+        "description": "This method is used by Burp to obtain the value of the next payload."
+      },
+      {
+        "signature": "boolean hasMorePayloads()",
+        "description": "This method is used by Burp to determine whether the payload generator is able to provide any further payloads."
+      },
+      {
+        "signature": "void reset()",
+        "description": "This method is used by Burp to reset the state of the payload generator so that the next call to getNextPayload() returns the first payload again."
+      }
+    ]
+  },
+  "IIntruderPayloadGeneratorFactory": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "IIntruderPayloadGenerator createNewInstance(IIntruderAttack attack)",
+        "description": "This method is used by Burp when the user starts an Intruder attack that uses this payload generator."
+      },
+      {
+        "signature": "java.lang.String getGeneratorName()",
+        "description": "This method is used by Burp to obtain the name of the payload generator."
+      }
+    ]
+  },
+  "IIntruderPayloadProcessor": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getProcessorName()",
+        "description": "This method is used by Burp to obtain the name of the payload processor."
+      },
+      {
+        "signature": "byte[] processPayload(byte[] currentPayload, byte[] originalPayload, byte[] baseValue)",
+        "description": "This method is invoked by Burp each time the processor should be applied to an Intruder payload."
+      }
+    ]
+  },
+  "IMenuItemHandler": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void menuItemClicked(java.lang.String menuItemCaption, IHttpRequestResponse[] messageInfo)",
+        "description": "Deprecated."
+      }
+    ]
+  },
+  "IMessageEditor": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.awt.Component getComponent()",
+        "description": "This method returns the UI component of the editor, for extensions to add to their own UI."
+      },
+      {
+        "signature": "byte[] getMessage()",
+        "description": "This method is used to retrieve the currently displayed message, which may have been modified by the user."
+      },
+      {
+        "signature": "byte[] getSelectedData()",
+        "description": "This method returns the data that is currently selected by the user."
+      },
+      {
+        "signature": "int[] getSelectionBounds()",
+        "description": "This method can be used to retrieve the bounds of the user's selection into the displayed message, if applicable."
+      },
+      {
+        "signature": "boolean isMessageModified()",
+        "description": "This method is used to determine whether the current message has been modified by the user."
+      },
+      {
+        "signature": "void setMessage(byte[] message, boolean isRequest)",
+        "description": "This method is used to display an HTTP message in the editor."
+      }
+    ]
+  },
+  "IMessageEditorController": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "IHttpService getHttpService()",
+        "description": "This method is used to retrieve the HTTP service for the current message."
+      },
+      {
+        "signature": "byte[] getRequest()",
+        "description": "This method is used to retrieve the HTTP request associated with the current message (which may itself be a response)."
+      },
+      {
+        "signature": "byte[] getResponse()",
+        "description": "This method is used to retrieve the HTTP response associated with the current message (which may itself be a request)."
+      }
+    ]
+  },
+  "IMessageEditorTab": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "byte[] getMessage()",
+        "description": "This method returns the currently displayed message."
+      },
+      {
+        "signature": "byte[] getSelectedData()",
+        "description": "This method is used to retrieve the data that is currently selected by the user."
+      },
+      {
+        "signature": "java.lang.String getTabCaption()",
+        "description": "This method returns the caption that should appear on the custom tab when it is displayed."
+      },
+      {
+        "signature": "java.awt.Component getUiComponent()",
+        "description": "This method returns the component that should be used as the contents of the custom tab when it is displayed."
+      },
+      {
+        "signature": "boolean isEnabled(byte[] content, boolean isRequest)",
+        "description": "The hosting editor will invoke this method before it displays a new HTTP message, so that the custom tab can indicate whether it should be enabled for that message."
+      },
+      {
+        "signature": "boolean isModified()",
+        "description": "This method is used to determine whether the currently displayed message has been modified by the user."
+      },
+      {
+        "signature": "void setMessage(byte[] content, boolean isRequest)",
+        "description": "The hosting editor will invoke this method to display a new message or to clear the existing message."
+      }
+    ]
+  },
+  "IMessageEditorTabFactory": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "IMessageEditorTab createNewInstance(IMessageEditorController controller, boolean editable)",
+        "description": "Burp will call this method once for each HTTP message editor, and the factory should provide a new instance of an IMessageEditorTab object."
+      }
+    ]
+  },
+  "IParameter": {
+    "extends": [],
+    "fields": [
+      {
+        "name": "PARAM_BODY",
+        "type": "byte",
+        "value": "1"
+      },
+      {
+        "name": "PARAM_COOKIE",
+        "type": "byte",
+        "value": "2"
+      },
+      {
+        "name": "PARAM_JSON",
+        "type": "byte",
+        "value": "6"
+      },
+      {
+        "name": "PARAM_MULTIPART_ATTR",
+        "type": "byte",
+        "value": "5"
+      },
+      {
+        "name": "PARAM_URL",
+        "type": "byte",
+        "value": "0"
+      },
+      {
+        "name": "PARAM_XML",
+        "type": "byte",
+        "value": "3"
+      },
+      {
+        "name": "PARAM_XML_ATTR",
+        "type": "byte",
+        "value": "4"
+      }
+    ],
+    "methods": [
+      {
+        "signature": "java.lang.String getName()",
+        "description": "This method is used to retrieve the parameter name."
+      },
+      {
+        "signature": "int getNameEnd()",
+        "description": "This method is used to retrieve the end offset of the parameter name within the HTTP request."
+      },
+      {
+        "signature": "int getNameStart()",
+        "description": "This method is used to retrieve the start offset of the parameter name within the HTTP request."
+      },
+      {
+        "signature": "byte getType()",
+        "description": "This method is used to retrieve the parameter type."
+      },
+      {
+        "signature": "java.lang.String getValue()",
+        "description": "This method is used to retrieve the parameter value."
+      },
+      {
+        "signature": "int getValueEnd()",
+        "description": "This method is used to retrieve the end offset of the parameter value within the HTTP request."
+      },
+      {
+        "signature": "int getValueStart()",
+        "description": "This method is used to retrieve the start offset of the parameter value within the HTTP request."
+      }
+    ]
+  },
+  "IProxyListener": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void processProxyMessage(boolean messageIsRequest, IInterceptedProxyMessage message)",
+        "description": "This method is invoked when an HTTP message is being processed by the Proxy."
+      }
+    ]
+  },
+  "IRequestInfo": {
+    "extends": [],
+    "fields": [
+      {
+        "name": "CONTENT_TYPE_AMF",
+        "type": "byte",
+        "value": "5"
+      },
+      {
+        "name": "CONTENT_TYPE_JSON",
+        "type": "byte",
+        "value": "4"
+      },
+      {
+        "name": "CONTENT_TYPE_MULTIPART",
+        "type": "byte",
+        "value": "2"
+      },
+      {
+        "name": "CONTENT_TYPE_NONE",
+        "type": "byte",
+        "value": "0"
+      },
+      {
+        "name": "CONTENT_TYPE_UNKNOWN",
+        "type": "byte",
+        "value": "-1"
+      },
+      {
+        "name": "CONTENT_TYPE_URL_ENCODED",
+        "type": "byte",
+        "value": "1"
+      },
+      {
+        "name": "CONTENT_TYPE_XML",
+        "type": "byte",
+        "value": "3"
+      }
+    ],
+    "methods": [
+      {
+        "signature": "int getBodyOffset()",
+        "description": "This method is used to obtain the offset within the request where the message body begins."
+      },
+      {
+        "signature": "byte getContentType()",
+        "description": "This method is used to obtain the content type of the message body."
+      },
+      {
+        "signature": "java.util.List<java.lang.String> getHeaders()",
+        "description": "This method is used to obtain the HTTP headers contained in the request."
+      },
+      {
+        "signature": "java.lang.String getMethod()",
+        "description": "This method is used to obtain the HTTP method used in the request."
+      },
+      {
+        "signature": "java.util.List<IParameter> getParameters()",
+        "description": "This method is used to obtain the parameters contained in the request."
+      },
+      {
+        "signature": "java.net.URL getUrl()",
+        "description": "This method is used to obtain the URL in the request."
+      }
+    ]
+  },
+  "IResponseInfo": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "int getBodyOffset()",
+        "description": "This method is used to obtain the offset within the response where the message body begins."
+      },
+      {
+        "signature": "java.util.List<ICookie> getCookies()",
+        "description": "This method is used to obtain details of the HTTP cookies set in the response."
+      },
+      {
+        "signature": "java.util.List<java.lang.String> getHeaders()",
+        "description": "This method is used to obtain the HTTP headers contained in the response."
+      },
+      {
+        "signature": "java.lang.String getInferredMimeType()",
+        "description": "This method is used to obtain the MIME type of the response, as inferred from the contents of the HTTP message body."
+      },
+      {
+        "signature": "java.lang.String getStatedMimeType()",
+        "description": "This method is used to obtain the MIME type of the response, as stated in the HTTP headers."
+      },
+      {
+        "signature": "short getStatusCode()",
+        "description": "This method is used to obtain the HTTP status code contained in the response."
+      }
+    ]
+  },
+  "IResponseKeywords": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.util.List<java.lang.String> getInvariantKeywords()",
+        "description": "This method is used to obtain the list of keywords whose counts do not vary between the analyzed responses."
+      },
+      {
+        "signature": "int getKeywordCount(java.lang.String keyword, int responseIndex)",
+        "description": "This method is used to obtain the number of occurrences of an individual keyword in a response."
+      },
+      {
+        "signature": "java.util.List<java.lang.String> getVariantKeywords()",
+        "description": "This method is used to obtain the list of keywords whose counts vary between the analyzed responses."
+      },
+      {
+        "signature": "void updateWith(byte[]... responses)",
+        "description": "This method is used to update the analysis based on additional responses."
+      }
+    ]
+  },
+  "IResponseVariations": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "int getAttributeValue(java.lang.String attributeName, int responseIndex)",
+        "description": "This method is used to obtain the value of an individual attribute in a response."
+      },
+      {
+        "signature": "java.util.List<java.lang.String> getInvariantAttributes()",
+        "description": "This method is used to obtain the list of attributes that do not vary between the analyzed responses."
+      },
+      {
+        "signature": "java.util.List<java.lang.String> getVariantAttributes()",
+        "description": "This method is used to obtain the list of attributes that vary between the analyzed responses."
+      },
+      {
+        "signature": "void updateWith(byte[]... responses)",
+        "description": "This method is used to update the analysis based on additional responses."
+      }
+    ]
+  },
+  "IScanIssue": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getConfidence()",
+        "description": "This method returns the issue confidence level."
+      },
+      {
+        "signature": "IHttpRequestResponse[] getHttpMessages()",
+        "description": "This method returns the HTTP messages on the basis of which the issue was generated."
+      },
+      {
+        "signature": "IHttpService getHttpService()",
+        "description": "This method returns the HTTP service for which the issue was generated."
+      },
+      {
+        "signature": "java.lang.String getIssueBackground()",
+        "description": "This method returns a background description for this type of issue."
+      },
+      {
+        "signature": "java.lang.String getIssueDetail()",
+        "description": "This method returns detailed information about this specific instance of the issue."
+      },
+      {
+        "signature": "java.lang.String getIssueName()",
+        "description": "This method returns the name of the issue type."
+      },
+      {
+        "signature": "int getIssueType()",
+        "description": "This method returns a numeric identifier of the issue type."
+      },
+      {
+        "signature": "java.lang.String getRemediationBackground()",
+        "description": "This method returns a background description of the remediation for this type of issue."
+      },
+      {
+        "signature": "java.lang.String getRemediationDetail()",
+        "description": "This method returns detailed information about the remediation for this specific instance of the issue."
+      },
+      {
+        "signature": "java.lang.String getSeverity()",
+        "description": "This method returns the issue severity level."
+      },
+      {
+        "signature": "java.net.URL getUrl()",
+        "description": "This method returns the URL for which the issue was generated."
+      }
+    ]
+  },
+  "IScanQueueItem": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void cancel()",
+        "description": "This method allows the scan queue item to be canceled."
+      },
+      {
+        "signature": "IScanIssue[] getIssues()",
+        "description": "This method returns details of the issues generated for the scan queue item."
+      },
+      {
+        "signature": "int getNumErrors()",
+        "description": "This method returns the number of network errors that have occurred for the scan queue item."
+      },
+      {
+        "signature": "int getNumInsertionPoints()",
+        "description": "This method returns the number of attack insertion points being used for the scan queue item."
+      },
+      {
+        "signature": "int getNumRequests()",
+        "description": "This method returns the number of requests that have been made for the scan queue item."
+      },
+      {
+        "signature": "byte getPercentageComplete()",
+        "description": "Deprecated."
+      },
+      {
+        "signature": "java.lang.String getStatus()",
+        "description": "This method returns a description of the status of the scan queue item."
+      }
+    ]
+  },
+  "IScannerCheck": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "int consolidateDuplicateIssues(IScanIssue existingIssue, IScanIssue newIssue)",
+        "description": "The Scanner invokes this method when the custom Scanner check has reported multiple issues for the same URL path."
+      },
+      {
+        "signature": "java.util.List<IScanIssue> doActiveScan(IHttpRequestResponse baseRequestResponse, IScannerInsertionPoint insertionPoint)",
+        "description": "The Scanner invokes this method for each insertion point that is actively scanned."
+      },
+      {
+        "signature": "java.util.List<IScanIssue> doPassiveScan(IHttpRequestResponse baseRequestResponse)",
+        "description": "The Scanner invokes this method for each base request / response that is passively scanned."
+      }
+    ]
+  },
+  "IScannerInsertionPoint": {
+    "extends": [],
+    "fields": [
+      {
+        "name": "INS_ENTIRE_BODY",
+        "type": "byte",
+        "value": "36"
+      },
+      {
+        "name": "INS_EXTENSION_PROVIDED",
+        "type": "byte",
+        "value": "65"
+      },
+      {
+        "name": "INS_HEADER",
+        "type": "byte",
+        "value": "32"
+      },
+      {
+        "name": "INS_PARAM_AMF",
+        "type": "byte",
+        "value": "7"
+      },
+      {
+        "name": "INS_PARAM_BODY",
+        "type": "byte",
+        "value": "1"
+      },
+      {
+        "name": "INS_PARAM_COOKIE",
+        "type": "byte",
+        "value": "2"
+      },
+      {
+        "name": "INS_PARAM_JSON",
+        "type": "byte",
+        "value": "6"
+      },
+      {
+        "name": "INS_PARAM_MULTIPART_ATTR",
+        "type": "byte",
+        "value": "5"
+      },
+      {
+        "name": "INS_PARAM_NAME_BODY",
+        "type": "byte",
+        "value": "35"
+      },
+      {
+        "name": "INS_PARAM_NAME_URL",
+        "type": "byte",
+        "value": "34"
+      },
+      {
+        "name": "INS_PARAM_URL",
+        "type": "byte",
+        "value": "0"
+      },
+      {
+        "name": "INS_PARAM_XML",
+        "type": "byte",
+        "value": "3"
+      },
+      {
+        "name": "INS_PARAM_XML_ATTR",
+        "type": "byte",
+        "value": "4"
+      },
+      {
+        "name": "INS_UNKNOWN",
+        "type": "byte",
+        "value": "127"
+      },
+      {
+        "name": "INS_URL_PATH_FILENAME",
+        "type": "byte",
+        "value": "37"
+      },
+      {
+        "name": "INS_URL_PATH_FOLDER",
+        "type": "byte",
+        "value": "33"
+      },
+      {
+        "name": "INS_URL_PATH_REST",
+        "type": "byte",
+        "value": "33"
+      },
+      {
+        "name": "INS_USER_PROVIDED",
+        "type": "byte",
+        "value": "64"
+      }
+    ],
+    "methods": [
+      {
+        "signature": "byte[] buildRequest(byte[] payload)",
+        "description": "This method is used to build a request with the specified payload placed into the insertion point."
+      },
+      {
+        "signature": "java.lang.String getBaseValue()",
+        "description": "This method returns the base value for this insertion point."
+      },
+      {
+        "signature": "java.lang.String getInsertionPointName()",
+        "description": "This method returns the name of the insertion point."
+      },
+      {
+        "signature": "byte getInsertionPointType()",
+        "description": "This method returns the type of the insertion point."
+      },
+      {
+        "signature": "int[] getPayloadOffsets(byte[] payload)",
+        "description": "This method is used to determine the offsets of the payload value within the request, when it is placed into the insertion point."
+      }
+    ]
+  },
+  "IScannerInsertionPointProvider": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.util.List<IScannerInsertionPoint> getInsertionPoints(IHttpRequestResponse baseRequestResponse)",
+        "description": "When a request is actively scanned, the Scanner will invoke this method, and the provider should provide a list of custom insertion points that will be used in the scan."
+      }
+    ]
+  },
+  "IScannerListener": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void newScanIssue(IScanIssue issue)",
+        "description": "This method is invoked when a new issue is added to Burp Scanner's results."
+      }
+    ]
+  },
+  "IScopeChangeListener": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void scopeChanged()",
+        "description": "This method is invoked whenever a change occurs to Burp's suite-wide target scope."
+      }
+    ]
+  },
+  "ISessionHandlingAction": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getActionName()",
+        "description": "This method is used by Burp to obtain the name of the session handling action."
+      },
+      {
+        "signature": "void performAction(IHttpRequestResponse currentRequest, IHttpRequestResponse[] macroItems)",
+        "description": "This method is invoked when the session handling action should be executed."
+      }
+    ]
+  },
+  "ITab": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.lang.String getTabCaption()",
+        "description": "Burp uses this method to obtain the caption that should appear on the custom tab when it is displayed."
+      },
+      {
+        "signature": "java.awt.Component getUiComponent()",
+        "description": "Burp uses this method to obtain the component that should be used as the contents of the custom tab when it is displayed."
+      }
+    ]
+  },
+  "ITempFile": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "void delete()",
+        "description": "Deprecated."
+      },
+      {
+        "signature": "byte[] getBuffer()",
+        "description": "This method is used to retrieve the contents of the buffer that was saved in the temporary file."
+      }
+    ]
+  },
+  "ITextEditor": {
+    "extends": [],
+    "fields": [],
+    "methods": [
+      {
+        "signature": "java.awt.Component getComponent()",
+        "description": "This method returns the UI component of the editor, for extensions to add to their own UI."
+      },
+      {
+        "signature": "byte[] getSelectedText()",
+        "description": "This method is used to obtain the currently selected text."
+      },
+      {
+        "signature": "int[] getSelectionBounds()",
+        "description": "This method can be used to retrieve the bounds of the user's selection into the displayed text, if applicable."
+      },
+      {
+        "signature": "byte[] getText()",
+        "description": "This method is used to retrieve the currently displayed text."
+      },
+      {
+        "signature": "boolean isTextModified()",
+        "description": "This method is used to determine whether the user has modified the contents of the editor."
+      },
+      {
+        "signature": "void setEditable(boolean editable)",
+        "description": "This method is used to control whether the editor is currently editable."
+      },
+      {
+        "signature": "void setSearchExpression(java.lang.String expression)",
+        "description": "This method is used to update the search expression that is shown in the search bar below the editor."
+      },
+      {
+        "signature": "void setText(byte[] text)",
+        "description": "This method is used to update the currently displayed text in the editor."
+      }
+    ]
+  }
+}

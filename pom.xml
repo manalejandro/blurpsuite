@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.blurpsuite</groupId>
+  <artifactId>blurpsuite</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <name>Blurp Suite</name>
+  <description>Independent Burp Extender-compatible proxy and extension host</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+    <exec.mainClass>com.blurpsuite.Main</exec.mainClass>
+  </properties>
+
+  <build>
+    <finalName>blurpsuite-${project.version}</finalName>
+
+    <!-- src/main/java also contains the generated burp compatibility interfaces.
+         Those files under src/main/java/burp are produced by
+         tools/generate_burp_api.py from tools/api-contract.json; do not edit them
+         by hand. -->
+
+    <!-- The repository's dependency-free tests live in tests/java. Declaring it as
+         the Maven test source directory keeps the conventional surefire layout
+         (tests are compiled to target/test-classes) without moving source files. -->
+    <testSourceDirectory>tests/java</testSourceDirectory>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>17</release>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.blurpsuite.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <mainClass>com.blurpsuite.Main</mainClass>
+        </configuration>
+        <executions>
+          <!-- The tests use a dependency-free custom runner rather than JUnit.
+               Surefire is configured to skip (see below); this execution runs the
+               real test suite during `mvn test`. -->
+          <execution>
+            <id>run-test-runner</id>
+            <phase>test</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>com.blurpsuite.tests.TestRunner</mainClass>
+              <additionalClasspathElements>
+                <additionalClasspathElement>${project.build.testOutputDirectory}</additionalClasspathElement>
+              </additionalClasspathElements>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <!-- Tests are plain public void test*() methods discovered by TestRunner,
+               not JUnit tests, so the surefire providers have nothing to execute.
+               The test source layout remains surefire-compatible for future JUnit
+               migrations; exec-maven-plugin above performs the actual test run. -->
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

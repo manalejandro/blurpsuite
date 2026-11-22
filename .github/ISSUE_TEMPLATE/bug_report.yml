@@ -1,0 +1,70 @@
+name: Bug report
+description: Report reproducible incorrect behavior in Blurp Suite
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please do not include sensitive traffic,
+        credentials, or personal data. For security vulnerabilities, follow
+        SECURITY.md instead of opening a public issue.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the incorrect behavior and what you expected instead.
+      placeholder: Traffic was not shown in the Proxy History after...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: List the exact commands, flags, and actions needed to reproduce.
+      placeholder: |
+        1. ./build.sh build
+        2. java -cp build/classes com.blurpsuite.Main --headless --port 8080
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output
+      description: Paste console output or stack traces, with secrets redacted.
+      render: shell
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Blurp Suite version or commit
+      placeholder: "1.0.0 or <commit sha>"
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: java-version
+    attributes:
+      label: Java version
+      placeholder: "openjdk 17.0.12"
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version (if using Python extensions)
+      placeholder: "3.13.0"
+    validations:
+      required: false

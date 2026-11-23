@@ -144,7 +144,7 @@ python/burp/              Python API objects exposed to extensions
 tools/                    api-contract.json and the API contract/generation scripts
 tests/java/               Dependency-free TestRunner plus CoreTests and ApiTests
 tests/python/             Python bridge unit tests (unittest, no third-party packages)
-tests/e2e/                End-to-end scripts: state-listener and proxy integration tests
+tests/e2e/                End-to-end scripts: state-listener, proxy and extension-kit tests
 examples/                 Java and Python example extensions
 ```
 

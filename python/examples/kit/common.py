@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 from collections import OrderedDict, deque
 from typing import Any, Iterable
@@ -83,8 +82,12 @@ def set_content_length(message: bytes, length: int) -> bytes:
     for line in lines:
         lowered = line.lower()
         if lowered.startswith(b"content-length:"):
-            kept.append(replacement)
-            replaced = True
+            # Collapse duplicates: two Content-Length headers create the
+            # ambiguous framing the kit warns about elsewhere.
+            if not replaced:
+                kept.append(replacement)
+                replaced = True
+            continue
         elif lowered.startswith(b"transfer-encoding:"):
             # A rewritten body must never keep CL and TE at the same time.
             continue
@@ -139,20 +142,6 @@ def setting(callbacks, name: str, default: str) -> str:
     return default if value is None else str(value)
 
 
-def set_setting(callbacks, name: str, value: str) -> None:
-    callbacks.saveExtensionSetting("blurp.kit." + name, str(value))
-
-
-def parse_args(callbacks, flag: str) -> list[str]:
-    """Read ``flag=value`` values from extension command-line arguments."""
-    values = []
-    for argument in callbacks.getCommandLineArguments():
-        argument = str(argument)
-        if argument.startswith(flag + "="):
-            values.append(argument[len(flag) + 1:])
-    return values
-
-
 def int_setting(callbacks, name: str, default: int) -> int:
     """Read an integer setting, falling back to ``default`` on bad input."""
     try:
@@ -192,12 +181,3 @@ def bounded_put(items: OrderedDict, key, value, size: int = 2000) -> None:
     items[key] = value
     if len(items) > size:
         items.popitem(last=False)
-
-
-def json_preview(body: bytes, limit: int = 2000) -> str:
-    try:
-        parsed = json.loads(body.decode("utf-8", "replace"))
-        result = json.dumps(parsed, indent=2, sort_keys=True, ensure_ascii=False)
-    except Exception:
-        result = text(body)
-    return result[:limit]

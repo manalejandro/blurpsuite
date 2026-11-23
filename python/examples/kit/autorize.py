@@ -83,14 +83,14 @@ class BurpExtender(IBurpExtender, IHttpListener):
                    f"same access with different session on {key}: "
                    f"{previous[1][0]}/{previous[1][1]}B vs {current[0]}/{current[1]}B")
         if bounded_add(self.replayed, key):
-            self._active_replay(messageInfo, url, marker)
+            self._active_replay(messageInfo, url)
 
     @staticmethod
     def _looks_allowed(signature) -> bool:
         code, _, preview = signature
         return 200 <= code < 400 and not any(word in preview for word in LOGIN_MARKERS)
 
-    def _active_replay(self, messageInfo, url, marker):
+    def _active_replay(self, messageInfo, url):
         if not (self.low_cookie or self.low_header):
             return
         request = messageInfo.getRequest()

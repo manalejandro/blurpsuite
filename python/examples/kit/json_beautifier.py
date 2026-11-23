@@ -43,7 +43,3 @@ class BurpExtender(IBurpExtender, IHttpListener):
         if updated != response:
             messageInfo.setResponse(updated)
             report(self.callbacks, self.TAG, f"formatted {len(body)}B JSON body")
-
-    @staticmethod
-    def _set_length(response: bytes, length: int) -> bytes:
-        return set_content_length(response, length)

@@ -5,9 +5,11 @@ from __future__ import annotations
 from collections import deque
 
 try:
-    from .common import body_of, bounded, enabled, report, setting, split_message, status_code, url_of
+    from .common import (body_of, bounded, enabled, int_setting, report, setting, split_message,
+                         status_code, url_of)
 except ImportError:  # loaded as a standalone bridge script
-    from common import body_of, bounded, enabled, report, setting, split_message, status_code, url_of
+    from common import (body_of, bounded, enabled, int_setting, report, setting, split_message,
+                        status_code, url_of)
 
 from burp import IBurpExtender, IHttpListener, IExtensionStateListener
 
@@ -17,7 +19,8 @@ class BurpExtender(IBurpExtender, IHttpListener, IExtensionStateListener):
 
     def registerExtenderCallbacks(self, callbacks):
         self.callbacks = callbacks
-        self.entries = deque(maxlen=2000)
+        self.limit = max(1, int_setting(callbacks, "logger.entries", 500))
+        self.entries = deque()
         self.filters = [value for value in setting(callbacks, "logger.filters", "").split(",") if value]
         callbacks.setExtensionName("Blurp Logger++")
         if enabled(callbacks, "logger"):
@@ -44,7 +47,7 @@ class BurpExtender(IBurpExtender, IHttpListener, IExtensionStateListener):
             "comment": messageInfo.getComment(),
             "tool": self.callbacks.getToolName(toolFlag),
         }
-        bounded(self.entries, entry)
+        bounded(self.entries, entry, self.limit)
         if self._matches(entry, response):
             report(self.callbacks, self.TAG,
                    f"{code} {length}B {entry['mime'] or '?'} {url}")

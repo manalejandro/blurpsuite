@@ -10,7 +10,8 @@ promise; items move as implementation and testing capacity allow.
   Javadoc signatures and constants.
 - Java extension loading from JARs, class directories, and single class files.
 - Python extensions through a JSON-RPC bridge using the `burp` package name.
-- Dependency-free unit tests and an end-to-end extension lifecycle test.
+- Dependency-free unit tests and three end-to-end scripts (state listener,
+  proxy, and extension kit).
 - Ten bundled offline Python extensions covering common pentest workflows
   (see [EXTENSION-KIT.md](EXTENSION-KIT.md)).
 

@@ -398,6 +398,34 @@ class KitTests(unittest.TestCase):
         self.assertEqual(common.url_of(request, Service("2001:db8::1", 80)),
                          "http://[2001:db8::1]:80/x")
 
+    def test_set_content_length_collapses_duplicate_headers(self):
+        import common
+        message = (b"HTTP/1.1 200 OK\r\nContent-Length: 1\r\n"
+                   b"Content-Length: 2\r\n\r\nx")
+        updated = common.set_content_length(message, 3)
+        self.assertEqual(updated.count(b"Content-Length:"), 1)
+        self.assertIn(b"Content-Length: 3", updated)
+
+    def test_logger_plus_honors_entry_limit(self):
+        callbacks = Callbacks(settings={"blurp.kit.logger.entries": "2"})
+        extension = load("logger_plus")()
+        extension.registerExtenderCallbacks(callbacks)
+        for path in ("/a", "/b", "/c"):
+            extension.processHttpMessage(4, False, Message(
+                f"GET {path} HTTP/1.1\r\n\r\n".encode(), response(b"ok")))
+        extension.extensionUnloaded()
+        self.assertTrue(any("captured 2" in line for line in callbacks.output))
+
+    def test_backslash_scanner_probes_lf_only_requests(self):
+        callbacks = Callbacks(replies=[
+            Message(response=response(b"invalid syntax")) for _ in range(10)])
+        extension = load("backslash_scanner")()
+        extension.registerExtenderCallbacks(callbacks)
+        extension.processHttpMessage(4, False, Message(
+            b"GET /x?a=1 HTTP/1.1\nHost: x.test\n\n", response(b"normal")))
+        self.assertTrue(callbacks.requests)
+        self.assertTrue(any("parser anomaly" in line for line in callbacks.output))
+
     def test_all_loader_registers_ten_modules(self):
         callbacks = Callbacks()
         extension = load("all")()

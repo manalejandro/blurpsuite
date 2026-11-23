@@ -51,6 +51,7 @@ Useful settings:
 | Setting | Default | Purpose |
 | --- | --- | --- |
 | `blurp.kit.logger.filters` | empty | Comma-separated terms to print from the traffic log. |
+| `blurp.kit.logger.entries` | `500` | Maximum responses kept in memory. |
 | `blurp.kit.paramminer.words` | built-in list | Comma-separated candidate parameter names. |
 | `blurp.kit.paramminer.limit` | `12` | Maximum probes per endpoint. |
 | `blurp.kit.activescan.active` | `true` | Enable active probes. |

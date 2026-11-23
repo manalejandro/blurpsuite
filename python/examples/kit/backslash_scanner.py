@@ -55,8 +55,8 @@ class BurpExtender(IBurpExtender, IHttpListener):
     def _probe(self, messageInfo, url):
         baseline = text(messageInfo.getResponse() or b"")
         request = messageInfo.getRequest()
-        head, marker, body = request.partition(b"\r\n\r\n")
-        if not marker or b"=" not in body and b"?" not in head:
+        head, separator, body = raw_split(request)
+        if not separator or (b"=" not in body and b"?" not in head):
             return
         for payload in PROBES:
             modified = self._inject(request, payload)

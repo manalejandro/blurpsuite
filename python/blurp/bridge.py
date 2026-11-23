@@ -50,11 +50,19 @@ class ProtocolStdout:
     def isatty(self) -> bool:
         return False
 
+    @property
+    def buffer(self):
+        # Keep binary writes on stderr too; otherwise ``sys.stdout.buffer``
+        # would bypass the protocol guard and corrupt the RPC pipe.
+        return getattr(sys.stderr, "buffer", sys.stderr)
+
     def fileno(self):
-        return self._stream.fileno()
+        return sys.stderr.fileno()
 
     def __getattr__(self, name):
-        return getattr(self._stream, name)
+        # Everything else mirrors stderr: forwarding to the real stdout would
+        # expose ``detach`` and similar handles that bypass the protocol pipe.
+        return getattr(sys.stderr, name)
 
 
 class Transport:
@@ -66,6 +74,10 @@ class Transport:
         self._listeners: dict[str, Any] = {}
         self._next_id_lock = threading.Lock()
         self._pipe_lock = threading.Lock()
+        # Hold the protocol stream: an extension that reassigns sys.stdout
+        # must not be able to redirect JSON-RPC frames away from the host.
+        current = sys.stdout
+        self._protocol_stdout = current if isinstance(current, ProtocolStdout) else None
         self.closed = False
 
     def call(self, method: str, params: dict | None = None) -> dict:
@@ -101,7 +113,7 @@ class Transport:
 
     def _send(self, message: dict) -> None:
         frame = json.dumps(message, separators=(",", ":")) + "\n"
-        output = sys.stdout
+        output = self._protocol_stdout or sys.stdout
         if isinstance(output, ProtocolStdout):
             output.transport_frame(frame)
         else:

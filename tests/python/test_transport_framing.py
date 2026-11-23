@@ -34,6 +34,19 @@ class TransportFramingTests(unittest.TestCase):
         self.assertEqual(len(parse_frames(pipe.getvalue())), 1)
         self.assertIn("noise from extension", errors.getvalue())
 
+    def test_protocol_stdout_exposes_stderr_handles_only(self):
+        pipe = io.StringIO()
+        errors = mock.Mock()
+        errors.buffer = io.BytesIO()
+        errors.fileno.return_value = 7
+        wrapped = ProtocolStdout(pipe)
+        with mock.patch.object(sys, "stderr", errors):
+            self.assertIs(wrapped.buffer, errors.buffer)
+            self.assertEqual(wrapped.fileno(), 7)
+            wrapped.detach()
+        errors.detach.assert_called_once_with()
+        self.assertEqual(pipe.getvalue(), "")
+
     def test_extension_output_during_frame_write_stays_off_the_rpc_pipe(self):
         pipe = io.StringIO()
         errors = io.StringIO()
@@ -56,6 +69,17 @@ class TransportFramingTests(unittest.TestCase):
             print("noise after frame")
         self.assertEqual(len(parse_frames(pipe.getvalue())), 1)
         self.assertEqual(errors.getvalue().count("noise"), 2)
+
+    def test_transport_keeps_frames_on_its_protocol_stream(self):
+        pipe = io.StringIO()
+        wrapped = ProtocolStdout(pipe)
+        with mock.patch.object(sys, "stdout", wrapped):
+            transport = Transport()
+        hijacked = io.StringIO()
+        with mock.patch.object(sys, "stdout", hijacked):
+            transport.notify("ping", {})
+        self.assertEqual(len(parse_frames(pipe.getvalue())), 1)
+        self.assertEqual(hijacked.getvalue(), "")
 
     def test_concurrent_notifications_are_whole_frames(self):
         pipe = io.StringIO()
